@@ -82,6 +82,49 @@ terraform apply \
 <!-- prettier-ignore-start -->
 <!-- textlint-disable -->
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0, < 2.0 |
+| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | >= 3.0, < 4.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0, < 5.0 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_cosmosdb_account.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_account) | resource |
+| [azurerm_cosmosdb_sql_container.visitor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_container) | resource |
+| [azurerm_cosmosdb_sql_database.visitor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_database) | resource |
+| [azurerm_dns_cname_record.swa](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_cname_record) | resource |
+| [azurerm_resource_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_static_web_app.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
+| [azurerm_static_web_app_custom_domain.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app_custom_domain) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+| [azurerm_dns_zone.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/dns_zone) | data source |
+
+## Modules
+
+No modules.
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_dns_zone_name"></a> [dns\_zone\_name](#input\_dns\_zone\_name) | Name of the existing DNS zone. | `string` | n/a | yes |
+| <a name="input_dns_zone_resource_group"></a> [dns\_zone\_resource\_group](#input\_dns\_zone\_resource\_group) | Resource group containing the DNS zone. | `string` | n/a | yes |
+| <a name="input_environment"></a> [environment](#input\_environment) | Name of Azure environment (dev/prd). | `string` | n/a | yes |
+| <a name="input_location"></a> [location](#input\_location) | Resource location for Azure resources. | `string` | n/a | yes |
+| <a name="input_project"></a> [project](#input\_project) | Project/organization code prefix for resource naming. | `string` | n/a | yes |
+| <a name="input_service"></a> [service](#input\_service) | Service short name for resource naming. | `string` | n/a | yes |
+| <a name="input_solution"></a> [solution](#input\_solution) | Solution name for resource naming. | `string` | n/a | yes |
+| <a name="input_subdomain"></a> [subdomain](#input\_subdomain) | Subdomain for the portfolio site (e.g., 'portfolio'). | `string` | n/a | yes |
+| <a name="input_cosmosdb_free_tier"></a> [cosmosdb\_free\_tier](#input\_cosmosdb\_free\_tier) | Enable Cosmos DB free tier. | `bool` | `true` | no |
+
+## Outputs
+
+No outputs.
 <!-- END_TF_DOCS -->
 <!-- textlint-enable -->
 <!-- prettier-ignore-end -->
