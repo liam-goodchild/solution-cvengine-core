@@ -7,7 +7,7 @@ The goal is to provide a modern, scalable, and cost-effective online presence us
 
 This solution:
 
-- Deploys a serverless portfolio website using Azure Static Web Apps
+- Deploys a serverless portfolio site using Azure Static Web Apps
 - Implements visitor tracking via Azure Functions and Cosmos DB
 - Automates infrastructure provisioning using Terraform and Azure DevOps
 - Maintains security and compliance through automated linting and validation
@@ -19,7 +19,7 @@ This solution:
 
 CVEngine uses a serverless architecture built entirely on Azure Platform-as-a-Service offerings.
 
-**Frontend**: Azure Static Web Apps hosts the portfolio website with global CDN distribution and custom domain support.
+**Frontend**: Azure Static Web Apps hosts the portfolio site with global CDN distribution and custom domain support.
 
 **Backend**: Azure Functions provides serverless API endpoints for visitor count tracking, connected to Cosmos DB for data persistence.
 
@@ -32,7 +32,7 @@ CVEngine uses a serverless architecture built entirely on Azure Platform-as-a-Se
 ```
 solution-cvengine-core/
 ├── .azuredevops/          # Pipeline definitions and linting configuration
-├── frontend/              # Static website HTML, CSS, and JavaScript
+├── frontend/              # Static site HTML, CSS, and JavaScript
 ├── functions/             # Azure Functions API code
 └── infra/                 # Terraform infrastructure as code
     ├── vars/              # Environment-specific variable files
