@@ -1,18 +1,6 @@
 locals {
-  locations = {
-    uksouth = "uks"
-  }
-  location = local.locations[var.location]
-  environment_short = {
-    dev = "D"
-    prd = "P"
-  }
-  prefix       = "${var.project}-core-${var.environment}-${local.location}"
-  prefix_short = "${var.project}core${local.environment_short[var.environment]}${local.location}"
+  location_short = "uks"
+  prefix         = "${var.project}-${var.solution}-${var.environment}-${local.location_short}-${var.service}"
 
-  # tflint-ignore: terraform_unused_declarations
-  st_naming = {
-    long  = replace("${local.prefix}-%sst-01", "-", "")
-    short = lower("${local.prefix_short}%sst01")
-  }
+  fqdn = var.environment == "prd" ? "${var.subdomain}.${var.dns_zone_name}" : "${var.subdomain}.${var.dns_zone_name}"
 }

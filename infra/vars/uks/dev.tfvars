@@ -1,8 +1,5 @@
 #########################################
-# Generic
+# Development Environment
 #########################################
 environment = "dev"
-location    = "uksouth"
-
-tags = {
-}
+subdomain   = "portfolio.dev"

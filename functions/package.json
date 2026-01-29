@@ -1,0 +1,13 @@
+{
+  "name": "swa-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@azure/cosmos": "3.17.3",
+    "@azure/functions": "4.0.0"
+  }
+}

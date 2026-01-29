@@ -1,164 +1,93 @@
+# CVEngine
+
+## Purpose
+
+This repository defines the infrastructure and application code for CVEngine, a serverless portfolio and CV platform.
+The goal is to provide a modern, scalable, and cost-effective online presence using Azure cloud services.
+
+This solution:
+
+- Deploys a serverless portfolio website using Azure Static Web Apps
+- Implements visitor tracking via Azure Functions and Cosmos DB
+- Automates infrastructure provisioning using Terraform and Azure DevOps
+- Maintains security and compliance through automated linting and validation
+- Provides a custom domain experience with DNS integration
+
+---
+
+## Architecture
+
+CVEngine uses a serverless architecture built entirely on Azure Platform-as-a-Service offerings.
+
+**Frontend**: Azure Static Web Apps hosts the portfolio website with global CDN distribution and custom domain support.
+
+**Backend**: Azure Functions provides serverless API endpoints for visitor count tracking, connected to Cosmos DB for data persistence.
+
+**Infrastructure**: Terraform manages all Azure resources, with state stored remotely in Azure Storage. Azure DevOps pipelines handle CI/CD workflows.
+
+---
+
+## Repository Structure
+
+```
+solution-cvengine-core/
+├── .azuredevops/          # Pipeline definitions and linting configuration
+├── frontend/              # Static website HTML, CSS, and JavaScript
+├── functions/             # Azure Functions API code
+└── infra/                 # Terraform infrastructure as code
+    ├── vars/              # Environment-specific variable files
+    └── *.tf               # Terraform resource definitions
+```
+
+---
+
+## Deployment
+
+### Prerequisites
+
+- Azure subscription with appropriate permissions
+- Terraform >= 1.0
+- Azure CLI >= 2.0
+- Configured Azure DevOps service connection
+
+### Automated Deployment
+
+1. Create a feature branch and make changes
+2. Push changes and open a pull request to `main`
+3. CI pipeline validates Terraform and runs linting
+4. Merge to `main` triggers production deployment via CD pipeline
+
+### Manual Deployment
+
+```bash
+cd infra
+terraform init \
+  -backend-config="resource_group_name=<backend-rg>" \
+  -backend-config="storage_account_name=<backend-sa>" \
+  -backend-config="container_name=solution-cvengine-core"
+
+terraform plan \
+  -var-file="vars/globals.tfvars" \
+  -var-file="vars/uks/dev.tfvars"
+
+terraform apply \
+  -var-file="vars/globals.tfvars" \
+  -var-file="vars/uks/dev.tfvars"
+```
+
+---
+
+## Terraform Documentation
+
 <!-- prettier-ignore-start -->
 <!-- textlint-disable -->
-
-# Repository Setup Standards
-
-This document defines the standard for setting up a new repository from this template.
-
-The primary objective is to ensure all repositories maintain consistent configuration, security settings, and documentation from the outset.
-
-- Ensures security features are enabled from day one
-- Maintains consistent branch protection across all repositories
-- Provides a repeatable, standardised setup process
-- Reduces configuration drift between projects
-- Enables automated documentation generation
-
----
-
-## 1. Set Default Branch
-
-In GitHub, set the default branch to:
-
-- `main`
-
----
-
-## 2. Enable Security Settings
-
-Enable the following security features on the repository:
-
-- Security advisories
-- Dependabot
-- Code scanning
-- Secret scanning
-
----
-
-## 3. Import Branch Ruleset
-
-Import the following JSON as a **branch ruleset**:
-
-```json
-{
-  "id": 12143210,
-  "name": "main-branch-protection",
-  "target": "branch",
-  "source_type": "Repository",
-  "source": "liam-goodchild/docs-engineering-standards",
-  "enforcement": "active",
-  "conditions": {
-    "ref_name": {
-      "exclude": [],
-      "include": [
-        "~DEFAULT_BRANCH"
-      ]
-    }
-  },
-  "rules": [
-    {
-      "type": "deletion"
-    },
-    {
-      "type": "non_fast_forward"
-    },
-    {
-      "type": "pull_request",
-      "parameters": {
-        "required_approving_review_count": 0,
-        "dismiss_stale_reviews_on_push": false,
-        "required_reviewers": [],
-        "require_code_owner_review": false,
-        "require_last_push_approval": false,
-        "required_review_thread_resolution": false,
-        "allowed_merge_methods": [
-          "merge",
-          "squash",
-          "rebase"
-        ]
-      }
-    }
-  ],
-  "bypass_actors": []
-}
-```
-
----
-
-## 4. Rename Repository
-
-Rename the repository using the following AI prompt:
-
-```text
-The repository will contain [description].
-Suggest a repository name following the naming convention at:
-https://raw.githubusercontent.com/liam-goodchild/docs-engineering-standards/main/repo-standards/repo-naming/README.md
-```
-
----
-
-## 5. Create CI/CD Pipelines, Service Principals and Service Connections
-
-Create the CI/CD pipelines in the relevant folder within Azure DevOps. Create the necessary service principals and service connections and ensure appropriate RBAC is granted.
-
----
-
-## 6. Update Pipeline Placeholders
-
-Update placeholder container and service connection names in the various pipelines with the correct values.
-
----
-
-## 7. Generate README
-
-Once the code in the repository is in a working state, generate a README using the following AI prompt:
-
-```text
-The repository is for [description of your project].
-
-Generate a README for my new repository following the template at:
-https://raw.githubusercontent.com/liam-goodchild/docs-engineering-standards/main/readme-standards/README.md
-
-Parse the repo to get a better understanding of the code but do not create any Terraform-specific information as this is automatically injected via TF Docs. The template README contains the block that should be put at the end to ensure Terraform documentation is injected.
-```
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
+<!-- textlint-enable -->
+<!-- prettier-ignore-end -->
 
 ---
 
 ## Summary
 
-Following these steps ensures your repository is properly configured with security features, branch protection, CI/CD pipelines, and documentation standards from the start.
-
-## Placeholder Terraform Documentation
-
-<!-- BEGIN_TF_DOCS -->
-## Requirements
-
-| Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0, < 2.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0, < 5.0 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0, < 4.0 |
-
-## Resources
-
-No resources.
-
-## Modules
-
-No modules.
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_environment"></a> [environment](#input\_environment) | Name of Azure environment. | `string` | n/a | yes |
-| <a name="input_location"></a> [location](#input\_location) | Resource location for Azure resources. | `string` | n/a | yes |
-| <a name="input_project"></a> [project](#input\_project) | Project short name. | `string` | n/a | yes |
-| <a name="input_tags"></a> [tags](#input\_tags) | Environment tags. | `map(string)` | n/a | yes |
-
-## Outputs
-
-No outputs.
-<!-- END_TF_DOCS -->
-
-<!-- textlint-enable -->
-<!-- prettier-ignore-end -->
+CVEngine provides a complete serverless portfolio solution using Azure Static Web Apps, Functions, and Cosmos DB. All infrastructure is defined as code using Terraform, with automated CI/CD pipelines ensuring quality and security through linting and validation. The solution leverages free-tier Azure services to minimize costs while maintaining professional functionality.

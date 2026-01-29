@@ -1,8 +1,5 @@
 #########################################
-# Generic
+# Production Environment
 #########################################
 environment = "prd"
-location    = "uksouth"
-
-tags = {
-}
+subdomain   = "portfolio"
