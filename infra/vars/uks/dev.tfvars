@@ -1,8 +1,4 @@
 #########################################
-# Generic
+# Development Environment
 #########################################
 environment = "dev"
-location    = "uksouth"
-
-tags = {
-}

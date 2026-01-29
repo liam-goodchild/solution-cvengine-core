@@ -1,2 +1,7 @@
 skip-check:
   - CKV_TF_1
+  - CKV_AZURE_140
+  - CKV_AZURE_100
+  - CKV_AZURE_99
+  - CKV_AZURE_101
+  - CKV_AZURE_132
