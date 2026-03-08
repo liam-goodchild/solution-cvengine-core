@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 CVEngine Core is a serverless portfolio website hosted on Azure. It consists of three components:
 
-- **frontend/** — Static HTML/CSS/JS portfolio site (Bootstrap 5, vanilla JS, no build step)
+- **frontend/** — Static HTML/CSS/JS portfolio site (vanilla CSS, no framework, no build step). Uses Space Grotesk + JetBrains Mono fonts, Font Awesome 6.3.0 icons, AOS scroll animations.
 - **functions/** — Node.js Azure Function (`UpdateVisitorCount`) that tracks visitors via Cosmos DB
 - **infra/** — Terraform IaC provisioning Azure Static Web App, Cosmos DB (SQL API, free tier), DNS CNAME
 

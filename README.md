@@ -41,42 +41,6 @@ solution-cvengine-core/
 
 ---
 
-## Deployment
-
-### Prerequisites
-
-- Azure subscription with appropriate permissions
-- Terraform >= 1.0
-- Azure CLI >= 2.0
-- Configured Azure DevOps service connection
-
-### Automated Deployment
-
-1. Create a feature branch and make changes
-2. Push changes and open a pull request to `main`
-3. CI pipeline validates Terraform and runs linting
-4. Merge to `main` triggers production deployment via CD pipeline
-
-### Manual Deployment
-
-```bash
-cd infra
-terraform init \
-  -backend-config="resource_group_name=<backend-rg>" \
-  -backend-config="storage_account_name=<backend-sa>" \
-  -backend-config="container_name=solution-cvengine-core"
-
-terraform plan \
-  -var-file="vars/globals.tfvars" \
-  -var-file="vars/uks/dev.tfvars"
-
-terraform apply \
-  -var-file="vars/globals.tfvars" \
-  -var-file="vars/uks/dev.tfvars"
-```
-
----
-
 ## Terraform Documentation
 
 <!-- prettier-ignore-start -->
