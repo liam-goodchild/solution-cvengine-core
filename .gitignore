@@ -41,3 +41,6 @@ avm.tflint_module.merged.hcl
 
 # MacOS
 .DS_Store
+
+# Claude Code
+.claude/

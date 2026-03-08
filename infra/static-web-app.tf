@@ -13,6 +13,13 @@ resource "azurerm_static_web_app" "main" {
   app_settings = {
     "CosmosDBConnectionString" = azurerm_cosmosdb_account.main.primary_sql_connection_string
   }
+
+  lifecycle {
+    ignore_changes = [
+      repository_url,
+      repository_branch,
+    ]
+  }
 }
 
 resource "azurerm_static_web_app_custom_domain" "main" {
