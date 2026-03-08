@@ -1,6 +1,6 @@
 # **Liam Goodchild**
 
-liamgoodchild12@hotmail.co.uk | 07398342855 | [GitHub](https://github.com/) | [LinkedIn](https://linkedin.com/) | [Portfolio](https://portfolio.com/)
+liamgoodchild12@hotmail.co.uk | 07398342855 | [GitHub](https://github.com/liam-goodchild) | [LinkedIn](https://linkedin.com/in/liam-goodchild-507690249) | [Portfolio](https://portfolio.com/)
 
 ---
 

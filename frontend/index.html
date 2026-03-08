@@ -967,24 +967,9 @@
         background: var(--bg-secondary);
       }
 
-      .certs::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--border-accent),
-          transparent
-        );
-      }
-
       .certs-grid {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         gap: 1.25rem;
       }
 
@@ -998,6 +983,12 @@
         .certs-grid {
           grid-template-columns: repeat(2, 1fr);
         }
+      }
+
+      a.cert-card {
+        text-decoration: none;
+        color: inherit;
+        display: block;
       }
 
       .cert-card {
@@ -1127,36 +1118,6 @@
         font-size: 1.125rem;
       }
 
-      /* ══════════════════════════════════════════════════════════════
-           FOOTER
-        ══════════════════════════════════════════════════════════════ */
-      .footer {
-        padding: 2.5rem 0;
-        border-top: 1px solid var(--border-subtle);
-        background: var(--bg-secondary);
-      }
-
-      .footer-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-      }
-
-      .footer-text {
-        font-size: 0.875rem;
-        color: var(--text-muted);
-      }
-
-      .footer-text a {
-        color: var(--accent-secondary);
-        transition: color var(--transition-fast);
-      }
-
-      .footer-text a:hover {
-        color: var(--accent-primary);
-      }
 
       /* ══════════════════════════════════════════════════════════════
            RESPONSIVE
@@ -1256,7 +1217,7 @@
             </div>
             <div class="hero-stat">
               <div class="hero-stat-value">
-                <span class="gradient-text">5</span>
+                <span class="gradient-text">6</span>
               </div>
               <div class="hero-stat-label">Certifications</div>
             </div>
@@ -1266,8 +1227,8 @@
             </div>
           </div>
           <div class="hero-actions">
-            <a href="#contact" class="btn btn-primary">
-              <i class="fas fa-paper-plane"></i> Contact Me
+            <a href="https://blog.skyhaven.ltd" target="_blank" class="btn btn-primary">
+              <i class="fas fa-blog"></i> Blog
             </a>
             <a
               href="https://github.com/liam-goodchild"
@@ -1438,15 +1399,12 @@
               </div>
               <div class="project-links">
                 <a
-                  href="https://github.com/liam-goodchild/app-cvengine"
+                  href="https://github.com/liam-goodchild/solution-cvengine-core"
                   target="_blank"
                   class="project-link"
                   aria-label="GitHub"
                 >
                   <i class="fab fa-github"></i>
-                </a>
-                <a href="#" class="project-link" aria-label="Live site">
-                  <i class="fas fa-external-link-alt"></i>
                 </a>
               </div>
             </div>
@@ -1470,7 +1428,7 @@
               </div>
               <div class="project-links">
                 <a
-                  href="https://github.com/liam-goodchild/app-powertoggle"
+                  href="https://github.com/liam-goodchild/solution-powertoggle-core"
                   target="_blank"
                   class="project-link"
                   aria-label="GitHub"
@@ -1492,14 +1450,14 @@
             </div>
           </div>
 
-          <div class="project-card" data- aos="fade-up" data-aos-delay="300">
+          <div class="project-card" data-aos="fade-up" data-aos-delay="300">
             <div class="project-header">
               <div class="project-icon">
                 <i class="fas fa-shield-halved"></i>
               </div>
               <div class="project-links">
                 <a
-                  href="https://github.com/liam-goodchild/app-certwatch"
+                  href="https://github.com/liam-goodchild/solution-certwatch-core"
                   target="_blank"
                   class="project-link"
                   aria-label="GitHub"
@@ -1531,7 +1489,7 @@
         </div>
 
         <div class="certs-grid">
-          <div class="cert-card" data-aos="fade-up" data-aos-delay="100">
+          <a href="https://learn.microsoft.com/en-us/users/liamgoodchild-3840/credentials/certification/azure-solutions-architect" target="_blank" class="cert-card" data-aos="fade-up" data-aos-delay="100">
             <img
               src="assets/img/AZ305 Logo.png"
               alt="AZ-305"
@@ -1539,7 +1497,7 @@
             />
             <div class="cert-name">AZ-305</div>
             <div class="cert-issuer">Solutions Architect</div>
-          </div>
+          </a>
           <div class="cert-card" data-aos="fade-up" data-aos-delay="150">
             <img
               src="assets/img/AZ400 Logo.png"
@@ -1549,7 +1507,7 @@
             <div class="cert-name">AZ-400</div>
             <div class="cert-issuer">DevOps Engineer</div>
           </div>
-          <div class="cert-card" data-aos="fade-up" data-aos-delay="200">
+          <a href="https://learn.microsoft.com/en-us/users/liamgoodchild-3840/credentials/certification/azure-administrator" target="_blank" class="cert-card" data-aos="fade-up" data-aos-delay="200">
             <img
               src="assets/img/AZ104 Logo.png"
               alt="AZ-104"
@@ -1557,8 +1515,8 @@
             />
             <div class="cert-name">AZ-104</div>
             <div class="cert-issuer">Administrator</div>
-          </div>
-          <div class="cert-card" data-aos="fade-up" data-aos-delay="250">
+          </a>
+          <a href="https://www.credly.com/earner/earned/badge/2aec90dc-2d5e-4fb9-af5b-0785b03845b8" target="_blank" class="cert-card" data-aos="fade-up" data-aos-delay="250">
             <img
               src="assets/img/CompTIA Security+ Logo.png"
               alt="Security+"
@@ -1566,8 +1524,8 @@
             />
             <div class="cert-name">Security+</div>
             <div class="cert-issuer">CompTIA</div>
-          </div>
-          <div class="cert-card" data-aos="fade-up" data-aos-delay="300">
+          </a>
+          <a href="https://www.credly.com/earner/earned/badge/bf5fa062-15f8-423d-ae3f-5a5954f21c99" target="_blank" class="cert-card" data-aos="fade-up" data-aos-delay="300">
             <img
               src="assets/img/CompTIA Network+ Logo.png"
               alt="Network+"
@@ -1575,7 +1533,16 @@
             />
             <div class="cert-name">Network+</div>
             <div class="cert-issuer">CompTIA</div>
-          </div>
+          </a>
+          <a href="https://www.credly.com/earner/earned/badge/a978ccb9-ad2b-453c-899c-bb44860ba067" target="_blank" class="cert-card" data-aos="fade-up" data-aos-delay="350">
+            <img
+              src="assets/img/CompTIA A+ Logo.png"
+              alt="A+"
+              class="cert-icon"
+            />
+            <div class="cert-name">A+</div>
+            <div class="cert-issuer">CompTIA</div>
+          </a>
         </div>
       </div>
     </section>
@@ -1615,21 +1582,6 @@
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-content">
-          <div class="footer-text">
-            &copy; 2025 Liam Goodchild. Built with
-            <a
-              href="https://azure.microsoft.com/en-us/products/app-service/static"
-              target="_blank"
-              >Azure Static Web Apps</a
-            >
-          </div>
-        </div>
-      </div>
-    </footer>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
