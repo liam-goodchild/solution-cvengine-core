@@ -32,6 +32,11 @@ variable "dns_zone_name" {
   type        = string
 }
 
+variable "platform_subscription_id" {
+  description = "Subscription ID for the platform subscription that contains legacy Azure DNS records in state."
+  type        = string
+}
+
 variable "cloudflare_api_token" {
   description = "Cloudflare API token with Zone and DNS edit permissions."
   type        = string
