@@ -1,4 +1,4 @@
 #########################################
-# Production Environment
+# ENVIRONMENT
 #########################################
 environment = "prd"

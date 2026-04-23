@@ -1,4 +1,4 @@
 #########################################
-# Development Environment
+# ENVIRONMENT
 #########################################
 environment = "dev"

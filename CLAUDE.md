@@ -26,8 +26,8 @@ npm run build --if-present
 cd infra
 terraform init -backend-config="resource_group_name=<rg>" -backend-config="storage_account_name=<sa>" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate"
 terraform validate
-terraform plan -var-file="vars/globals.tfvars" -var-file="vars/uks/prd.tfvars"
-terraform apply -var-file="vars/globals.tfvars" -var-file="vars/uks/prd.tfvars"
+terraform plan -var-file="vars/prd.tfvars"
+terraform apply -var-file="vars/prd.tfvars"
 ```
 
 ### Linting
@@ -51,9 +51,8 @@ Example: `sh-app-prd-uks-cve-rg-01`
 
 ### Terraform Variable Structure
 
-- `infra/vars/globals.tfvars` — Shared config (location, project, solution, DNS)
-- `infra/vars/uks/dev.tfvars` — Dev environment
-- `infra/vars/uks/prd.tfvars` — Production environment
+- `infra/vars/dev.tfvars` — Dev environment
+- `infra/vars/prd.tfvars` — Production environment
 
 ### CI/CD (Azure DevOps)
 

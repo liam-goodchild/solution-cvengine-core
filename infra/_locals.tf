@@ -1,6 +1,8 @@
 locals {
-  location_short = "uks"
-  prefix         = "${var.project}-${var.solution}-${var.environment}-${local.location_short}-${var.service}"
+  resource_suffix      = "${var.workload}-${var.environment}-${var.location_short}-${var.instance}"
+  resource_suffix_flat = "${var.workload}${var.environment}${var.location_short}${var.instance}"
 
-  fqdn = var.environment == "prd" ? "${var.subdomain}.${var.dns_zone_name}" : "${var.subdomain}.dev.${var.dns_zone_name}"
+  tags = {
+    managed-by = "terraform"
+  }
 }
