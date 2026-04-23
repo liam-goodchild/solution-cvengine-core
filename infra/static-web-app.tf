@@ -1,17 +1,15 @@
-resource "azurerm_resource_group" "main" {
-  name     = "${local.prefix}-rg-01"
-  location = var.location
-}
-
 resource "azurerm_static_web_app" "main" {
-  name                = "${local.prefix}-stapp-01"
+  name                = "stapp-${local.resource_suffix}"
   resource_group_name = azurerm_resource_group.main.name
   location            = "westeurope"
   sku_tier            = "Free"
   sku_size            = "Free"
+  tags                = local.tags
 
   app_settings = {
     "CosmosDBConnectionString" = azurerm_cosmosdb_account.main.primary_sql_connection_string
+    "CosmosDBDatabaseName"     = azurerm_cosmosdb_sql_database.visitor.name
+    "CosmosDBContainerName"    = azurerm_cosmosdb_sql_container.visitor.name
   }
 
   lifecycle {
@@ -24,8 +22,6 @@ resource "azurerm_static_web_app" "main" {
 
 resource "azurerm_static_web_app_custom_domain" "main" {
   static_web_app_id = azurerm_static_web_app.main.id
-  domain_name       = local.fqdn
-  validation_type   = "cname-delegation"
-
-  depends_on = [azurerm_dns_cname_record.swa]
+  domain_name       = var.dns_zone_name
+  validation_type   = "dns-txt-token"
 }

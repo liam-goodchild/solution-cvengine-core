@@ -1,7 +1,20 @@
-resource "azurerm_dns_cname_record" "swa" {
-  name                = var.environment == "prd" ? var.subdomain : "${var.subdomain}.dev"
+resource "azurerm_dns_a_record" "swa" {
+  name                = "@"
   zone_name           = data.azurerm_dns_zone.main.name
   resource_group_name = var.dns_zone_resource_group
   ttl                 = 3600
-  record              = azurerm_static_web_app.main.default_host_name
+  target_resource_id  = azurerm_static_web_app.main.id
+  tags                = local.tags
+}
+
+resource "azurerm_dns_txt_record" "swa" {
+  name                = "@"
+  zone_name           = data.azurerm_dns_zone.main.name
+  resource_group_name = var.dns_zone_resource_group
+  ttl                 = 3600
+  tags                = local.tags
+
+  record {
+    value = azurerm_static_web_app_custom_domain.main.validation_token
+  }
 }

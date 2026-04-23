@@ -1,6 +1,13 @@
 variable "location" {
   description = "Resource location for Azure resources."
   type        = string
+  default     = "uksouth"
+}
+
+variable "location_short" {
+  description = "Short region token for resource naming."
+  type        = string
+  default     = "uks"
 }
 
 variable "environment" {
@@ -8,33 +15,26 @@ variable "environment" {
   type        = string
 }
 
-variable "project" {
-  description = "Project/organization code prefix for resource naming."
+variable "workload" {
+  description = "Workload name for resource naming."
   type        = string
+  default     = "cvengine"
 }
 
-variable "solution" {
-  description = "Solution name for resource naming."
+variable "instance" {
+  description = "Two-digit resource instance identifier."
   type        = string
-}
-
-variable "service" {
-  description = "Service short name for resource naming."
-  type        = string
+  default     = "01"
 }
 
 variable "dns_zone_name" {
   description = "Name of the existing DNS zone."
   type        = string
+  default     = "skyhaven.ltd"
 }
 
 variable "dns_zone_resource_group" {
   description = "Resource group containing the DNS zone."
-  type        = string
-}
-
-variable "subdomain" {
-  description = "Subdomain for the portfolio site (e.g., 'portfolio')."
   type        = string
 }
 
