@@ -1,9 +1,10 @@
 resource "azurerm_cosmosdb_account" "main" {
-  name                = "${local.prefix}-cosmos-01"
+  name                = "cosmos-${local.resource_suffix}"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
+  tags                = local.tags
 
   free_tier_enabled = var.cosmosdb_free_tier
 
@@ -18,13 +19,13 @@ resource "azurerm_cosmosdb_account" "main" {
 }
 
 resource "azurerm_cosmosdb_sql_database" "visitor" {
-  name                = "visitorDatabase"
+  name                = "cosmos-database-${local.resource_suffix}"
   resource_group_name = azurerm_resource_group.main.name
   account_name        = azurerm_cosmosdb_account.main.name
 }
 
 resource "azurerm_cosmosdb_sql_container" "visitor" {
-  name                = "visitorContainer"
+  name                = "cosmos-container-${local.resource_suffix}"
   resource_group_name = azurerm_resource_group.main.name
   account_name        = azurerm_cosmosdb_account.main.name
   database_name       = azurerm_cosmosdb_sql_database.visitor.name
