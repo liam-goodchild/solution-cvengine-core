@@ -4,69 +4,77 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CVEngine Core is a serverless portfolio site hosted on Azure. It consists of three components:
+CVEngine is a serverless portfolio site hosted on Azure. Three components:
 
-- **frontend/** — Static HTML/CSS/JS portfolio site (vanilla CSS, no framework, no build step). Uses Space Grotesk + JetBrains Mono fonts, Font Awesome 6.3.0 icons, AOS scroll animations.
-- **functions/** — Node.js Azure Function (`UpdateVisitorCount`) that tracks visitors via Cosmos DB
-- **infra/** — Terraform IaC provisioning Azure Static Web App, Cosmos DB (SQL API, free tier), DNS CNAME
+- **frontend/** — Static HTML/CSS/JS portfolio site (vanilla CSS, no framework, no build step). Space Grotesk + JetBrains Mono fonts, Font Awesome 6.3.0, AOS scroll animations.
+- **functions/** — Node.js 18.x Azure Function (`UpdateVisitorCount`, GET/POST) tracking visitors in Cosmos DB. Runtime v2.0. Cosmos connection via `COSMOSDB_CONNECTION_STRING`.
+- **infra/** — Terraform IaC: Resource Group, Static Web App + custom domain, Cosmos DB (SQL API, free tier), DNS CNAME on existing zone.
 
 ## Common Commands
 
-### Azure Functions (backend)
+### Azure Functions
 
 ```bash
 cd functions
-npm install
+npm ci              # CI uses `npm ci` — requires package-lock.json
 npm run build --if-present
 ```
 
 ### Terraform
 
+State lives in a platform storage account; backend is configured at init time:
+
 ```bash
 cd infra
-terraform init -backend-config="resource_group_name=<rg>" -backend-config="storage_account_name=<sa>" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate"
+terraform init \
+  -backend-config="resource_group_name=<rg>" \
+  -backend-config="storage_account_name=sttfsplatform<env>uks01" \
+  -backend-config="container_name=<repo-name>" \
+  -backend-config="key=terraform.tfstate"
 terraform validate
-terraform plan -var-file="vars/prd.tfvars"
+terraform plan  -var-file="vars/prd.tfvars"
 terraform apply -var-file="vars/prd.tfvars"
 ```
-
-### Linting
-
-Linting runs in CI via Super-Linter. Configs live in `.azuredevops/linters/`:
-
-- **Prettier** (`.prettierrc.json`): YAML uses single quotes, JSON uses double quotes
-- **TFLint** (`.tflint.hcl`): `terraform_unused_declarations` rule is disabled
-- **Checkov** (`.checkov.yaml`): Several Azure checks skipped for free-tier compatibility
 
 ## Architecture
 
 ### Request Flow
 
-Browser → Azure Static Web App (frontend/) → Azure Function API (`/api/UpdateVisitorCount`) → Cosmos DB (`visitorDatabase.visitorContainer`)
+Browser → Azure Static Web App (frontend/) → Azure Function API (`/api/UpdateVisitorCount`) → Cosmos DB (`visitorDatabase.visitorContainer`).
 
-### Infrastructure Naming Convention
+### Naming Convention
 
-Resources follow: `${project}-${solution}-${environment}-${location}-${service}-<type>-01`
-Example: `sh-app-prd-uks-cve-rg-01`
+`${project}-${solution}-${environment}-${location}-${service}-<type>-01` — e.g. `sh-app-prd-uks-cve-rg-01`.
 
-### Terraform Variable Structure
+### Terraform Variables
 
-- `infra/vars/dev.tfvars` — Dev environment
-- `infra/vars/prd.tfvars` — Production environment
+- `infra/vars/dev.tfvars` — dev
+- `infra/vars/prd.tfvars` — prd
 
-### CI/CD (Azure DevOps)
+Terraform: `>= 1.0, < 2.0` (CI pins `1.9.8`). Providers: `azurerm >= 4.0 < 5.0`, `azuread >= 3.0 < 4.0`.
 
-Pipelines in `.azuredevops/`:
+### CI/CD (GitHub Actions)
 
-- **ci-terraform.yaml** — PR validation: lint, checkov, terraform plan
-- **cd-terraform.yaml** — Main branch: plan → apply → deploy static web app → Git version tag
-- **dev-terraform.yaml** — Manual trigger for dev infrastructure
-- **destroy-terraform.yaml** — Requires typing "DESTROY" to confirm
+Workflows in `.github/workflows/`:
 
-Service connection: `sh-sc-cvengine`
+- **terraform.yml** — Push to `major/**`, `minor/**`, `patch/**` under `infra/**`, or `workflow_dispatch` (env: dev/prd, action: plan/apply/destroy). Uses OIDC (`ARM_USE_OIDC=true`) via federated creds; no client secret. Composite action `./.github/actions/ensure-tfstate-container` bootstraps the backend container.
+- **swa.yml** — Push to `major/**` / `minor/**` / `patch/**` under `frontend/**` or `functions/**`. Logs into Azure via OIDC, fetches the SWA deployment token at runtime with `az staticwebapp secrets list`, then runs `azure/static-web-apps-deploy`. `app_location: frontend`, `api_location: functions`.
+- **linting.yml** — Super-Linter (Biome disabled).
+- **zizmor.yml** — GitHub Actions workflow security scanner.
+- **tag.yml** — Git version tagging.
 
-### Functions Runtime
+Linter configs in `.github/linters/` (Prettier, TFLint, Checkov).
 
-- Node.js 18.x, Azure Functions runtime v2.0
-- Single function: `UpdateVisitorCount` (GET/POST)
-- Cosmos DB connection via `COSMOSDB_CONNECTION_STRING` env var
+Secrets required in the environment (`dev` / `prd`): `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_PLATFORM_SUBSCRIPTION_ID`.
+
+Branch naming drives CI: only `major/**`, `minor/**`, `patch/**` branches trigger deploy workflows on push.
+
+### Pipeline Hardening Conventions
+
+Workflows follow zizmor/Checkov findings baked into CI:
+
+- `persist-credentials: false` on every `actions/checkout`.
+- Third-party actions pinned to commit SHA with a trailing `# vX.Y.Z` comment (e.g. `azure/login@a457da9...`). First-party `actions/*` may use `@vN`.
+- Least-privilege `permissions:` block per workflow; `id-token: write` only where OIDC is needed.
+
+Keep these when editing or adding workflows.
