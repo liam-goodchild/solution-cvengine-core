@@ -66,3 +66,4 @@ jobs:
           app_location: frontend
           api_location: functions
           output_location: ""
+          skip_api_build: true
