@@ -27,18 +27,19 @@ variable "instance" {
   default     = "01"
 }
 
-variable "platform_subscription_id" {
-  description = "Subscription ID for the platform subscription hosting shared DNS resources."
-  type        = string
-}
-
 variable "dns_zone_name" {
-  description = "Name of the existing DNS zone in the platform subscription."
+  description = "Domain name for the public DNS zone."
   type        = string
 }
 
-variable "dns_zone_resource_group" {
-  description = "Resource group containing the DNS zone in the platform subscription."
+variable "cloudflare_api_token" {
+  description = "Cloudflare API token with Zone and DNS edit permissions."
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_account_id" {
+  description = "Cloudflare account ID."
   type        = string
 }
 

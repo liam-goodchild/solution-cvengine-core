@@ -41,7 +41,8 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_USE_OIDC: true
-      TF_VAR_platform_subscription_id: ${{ secrets.AZURE_PLATFORM_SUBSCRIPTION_ID }}
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -73,6 +74,19 @@ jobs:
             -backend-config="container_name=$REPO_NAME" \
             -backend-config="key=terraform.tfstate" \
             -backend-config="subscription_id=${{ secrets.AZURE_PLATFORM_SUBSCRIPTION_ID }}"
+
+      - name: "Remove Migrated Azure DNS Records From State"
+        run: |
+          set -euo pipefail
+
+          for address in \
+            "azurerm_dns_a_record.swa" \
+            "azurerm_dns_txt_record.swa"
+          do
+            if terraform -chdir=infra state list | grep -Fxq "$address"; then
+              terraform -chdir=infra state rm "$address"
+            fi
+          done
 
       - name: "Terraform Plan"
         if: inputs.terraform_action == 'plan' || inputs.terraform_action == ''

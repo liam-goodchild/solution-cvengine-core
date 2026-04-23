@@ -59,6 +59,8 @@ jobs:
 
       - name: Deploy Static Web App
         uses: azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # v1
+        env:
+          NODE_VERSION: "20"
         with:
           azure_static_web_apps_api_token: ${{ steps.swa-token.outputs.token }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}

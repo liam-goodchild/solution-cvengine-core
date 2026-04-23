@@ -1,5 +1,8 @@
-data "azurerm_dns_zone" "main" {
-  provider            = azurerm.dns
-  name                = var.dns_zone_name
-  resource_group_name = var.dns_zone_resource_group
+data "cloudflare_zones" "main" {
+  account = {
+    id = var.cloudflare_account_id
+  }
+
+  name   = var.dns_zone_name
+  status = "active"
 }
