@@ -3,6 +3,6 @@ resource "cloudflare_dns_record" "swa_cname" {
   type    = "CNAME"
   name    = var.dns_zone_name
   content = azurerm_static_web_app.main.default_host_name
-  proxied = false
+  proxied = true
   ttl     = 1
 }
