@@ -3,6 +3,6 @@ locals {
   resource_suffix_flat = "${var.workload}${var.environment}${var.location_short}${var.instance}"
 
   tags = {
-    managed-by = "github-actions"
+    managed-by = "terraform"
   }
 }
