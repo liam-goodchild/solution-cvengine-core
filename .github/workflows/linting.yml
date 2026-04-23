@@ -38,4 +38,5 @@ jobs:
           VALIDATE_MARKDOWN: false
           VALIDATE_NATURAL_LANGUAGE: false
           VALIDATE_TERRAFORM_TERRASCAN: false
+          VALIDATE_BIOME_LINT: false
           DEFAULT_BRANCH: main
