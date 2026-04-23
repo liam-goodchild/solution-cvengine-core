@@ -22,6 +22,6 @@ resource "azurerm_static_web_app" "main" {
 
 resource "azurerm_static_web_app_custom_domain" "main" {
   static_web_app_id = azurerm_static_web_app.main.id
-  domain_name       = var.dns_zone_name
+  domain_name       = data.azurerm_dns_zone.main.name
   validation_type   = "dns-txt-token"
 }

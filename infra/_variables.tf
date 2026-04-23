@@ -27,14 +27,18 @@ variable "instance" {
   default     = "01"
 }
 
-variable "dns_zone_name" {
-  description = "Name of the existing DNS zone."
+variable "platform_subscription_id" {
+  description = "Subscription ID for the platform subscription hosting shared DNS resources."
   type        = string
-  default     = "skyhaven.ltd"
+}
+
+variable "dns_zone_name" {
+  description = "Name of the existing DNS zone in the platform subscription."
+  type        = string
 }
 
 variable "dns_zone_resource_group" {
-  description = "Resource group containing the DNS zone."
+  description = "Resource group containing the DNS zone in the platform subscription."
   type        = string
 }
 
