@@ -25,6 +25,10 @@
   <nav class="nav" id="navbar">
     <div class="nav-left"></div>
     <div class="nav-links">
+      <div class="visitor-mini" aria-label="Visitor count">
+        <span class="visitor-mini-label">Visitors</span>
+        <span class="visitor-mini-value" id="visitorCount">—</span>
+      </div>
       <div class="accent-picker" aria-label="Choose accent colour">
         <button class="accent-option accent-option-red" type="button" data-accent="red" aria-label="Use red accent"
           title="Red"></button>
@@ -329,15 +333,36 @@
       <div class="section-label"><span class="section-numeral">IV</span></div>
       <h2 class="section-heading">Blog.</h2>
     </div>
-      <!-- BLOG_POSTS_START -->
-      <a href="posts/example-post.html" class="writing-row reveal writing-row-last" data-delay="40">
-        <span class="writing-num">I</span>
-        <span class="writing-date">APR 2026</span>
-        <span class="writing-title">Example Blog Post Title</span>
-        <span class="writing-time">4 min</span>
-        <span class="writing-arrow">&rarr;</span>
-      </a>
-      <!-- BLOG_POSTS_END -->
+    <div class="writing-empty reveal" data-delay="40">
+      <div class="writing-empty-copy">
+        <p class="writing-empty-kicker">No posts live yet</p>
+        <h3 class="writing-empty-title">Stay tuned, the thinking is in progress.</h3>
+        <p class="writing-empty-text">
+          The blog section is warming up. Leave your email and I’ll let you know
+          when the first post lands.
+        </p>
+      </div>
+
+      <form class="writing-interactive" id="notifyForm">
+        <label class="notify-label" for="notifyEmail">Get notified by email</label>
+        <div class="notify-row">
+          <input
+            class="notify-input"
+            id="notifyEmail"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+          <button class="notify-btn" type="submit">Notify me</button>
+        </div>
+        <p class="notify-output" id="notifyOutput" aria-live="polite">
+          No spam, just a quick note when the blog goes live.
+        </p>
+      </form>
+    </div>
+
   </section>
 
   <!-- Contact Footer -->
@@ -500,11 +525,42 @@
       try {
         var response = await fetch("/api/UpdateVisitorCount");
         if (response.ok) {
-          // API is live — count tracked silently
+          var data = await response.json();
+          var visitorCount = document.getElementById("visitorCount");
+          if (visitorCount && data && typeof data.visitorCount !== "undefined") {
+            visitorCount.textContent = Number(data.visitorCount).toLocaleString();
+          }
         }
       } catch (e) {
-        // API offline — no visible indicator needed
+        var visitorCountFallback = document.getElementById("visitorCount");
+        if (visitorCountFallback) {
+          visitorCountFallback.textContent = "Live soon";
+        }
       }
+    })();
+
+    // ── Notify Me Form ────────────────────────────────────────────
+    (function () {
+      var form = document.getElementById("notifyForm");
+      var output = document.getElementById("notifyOutput");
+      var input = document.getElementById("notifyEmail");
+      if (!form || !output || !input) return;
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var email = input.value.trim();
+        if (!email) return;
+
+        var subject = encodeURIComponent("Please notify me when the blog goes live");
+        var body = encodeURIComponent(
+          "Hi Liam,\n\nPlease let me know when the blog section starts publishing posts.\n\nMy email: " +
+            email +
+            "\n"
+        );
+
+        window.location.href = "mailto:liamgoodchild12@hotmail.co.uk?subject=" + subject + "&body=" + body;
+        output.textContent = "Your email app should open with a notification request ready to send.";
+      });
     })();
   </script>
 </body>
