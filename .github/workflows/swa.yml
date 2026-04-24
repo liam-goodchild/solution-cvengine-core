@@ -9,6 +9,8 @@ on:
     paths:
       - "frontend/**"
       - "functions/**"
+      - "docs/blog/**"
+      - "scripts/build_blog.py"
   workflow_dispatch:
     inputs:
       environment:
@@ -35,6 +37,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Build blog
+        run: python scripts/build_blog.py
 
       - name: Install API dependencies
         run: npm ci

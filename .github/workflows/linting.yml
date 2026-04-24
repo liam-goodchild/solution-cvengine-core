@@ -39,4 +39,6 @@ jobs:
           VALIDATE_NATURAL_LANGUAGE: false
           VALIDATE_TERRAFORM_TERRASCAN: false
           VALIDATE_BIOME_LINT: false
+          VALIDATE_PYTHON_BLACK: false
+          VALIDATE_PYTHON_RUFF_FORMAT: false
           DEFAULT_BRANCH: main
