@@ -7,7 +7,7 @@ Create one Markdown file per article in this directory. The build script generat
 
 ## New post template
 
-```markdown
+````markdown
 ---
 title: "My Post Title"
 description: "A short one-line summary shown on the generated post page."
@@ -31,7 +31,7 @@ Write the post in Markdown.
 terraform fmt -check
 terraform validate
 ```
-```
+````
 
 `slug` and `readTime` are optional. If omitted, the filename and estimated read time are used.
 

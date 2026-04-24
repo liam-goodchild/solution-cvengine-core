@@ -17,6 +17,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+MetaValue = str | list[str]
+
 ROOT = Path(__file__).resolve().parents[1]
 BLOG_SOURCE_DIR = ROOT / "docs" / "blog"
 POST_OUTPUT_DIR = ROOT / "frontend" / "posts"
@@ -27,7 +29,9 @@ END_MARKER = "<!-- BLOG_POSTS_END -->"
 
 
 @dataclass(frozen=True)
-class Post:
+class Post:  # pylint: disable=too-many-instance-attributes
+    """A parsed blog post and its derived rendering metadata."""
+
     title: str
     description: str
     date: str
@@ -39,14 +43,20 @@ class Post:
 
     @property
     def output_path(self) -> Path:
+        """Return the generated HTML output path for this post."""
+
         return POST_OUTPUT_DIR / f"{self.slug}.html"
 
     @property
     def href_from_index(self) -> str:
+        """Return the relative post URL used by the homepage listing."""
+
         return f"posts/{self.slug}.html"
 
     @property
     def display_date(self) -> str:
+        """Return the formatted date used in rendered pages."""
+
         try:
             return datetime.strptime(self.date, "%Y-%m-%d").strftime("%b %Y").upper()
         except ValueError:
@@ -54,6 +64,8 @@ class Post:
 
     @property
     def sort_date(self) -> datetime:
+        """Return a sortable date, falling back to the oldest date."""
+
         try:
             return datetime.strptime(self.date, "%Y-%m-%d")
         except ValueError:
@@ -61,11 +73,15 @@ class Post:
 
 
 def slugify(value: str) -> str:
+    """Convert a title or filename into a URL-safe slug."""
+
     slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
     return slug or "post"
 
 
-def parse_front_matter(markdown: str) -> tuple[dict[str, object], str]:
+def parse_front_matter(markdown: str) -> tuple[dict[str, MetaValue], str]:
+    """Parse simple YAML-like front matter from a Markdown document."""
+
     markdown = markdown.replace("\r\n", "\n")
     if not markdown.startswith("---\n"):
         return {}, markdown
@@ -75,7 +91,7 @@ def parse_front_matter(markdown: str) -> tuple[dict[str, object], str]:
     except ValueError:
         return {}, markdown
 
-    meta: dict[str, object] = {}
+    meta: dict[str, MetaValue] = {}
     current_list_key: str | None = None
 
     for line in raw_meta.splitlines():
@@ -84,9 +100,9 @@ def parse_front_matter(markdown: str) -> tuple[dict[str, object], str]:
 
         list_match = re.match(r"^\s+-\s+(.+)$", line)
         if list_match and current_list_key:
-            meta.setdefault(current_list_key, [])
-            assert isinstance(meta[current_list_key], list)
-            meta[current_list_key].append(clean_meta_value(list_match.group(1)))
+            list_value = meta.setdefault(current_list_key, [])
+            assert isinstance(list_value, list)
+            list_value.append(clean_meta_value(list_match.group(1)))
             continue
 
         key_match = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", line)
@@ -105,6 +121,8 @@ def parse_front_matter(markdown: str) -> tuple[dict[str, object], str]:
 
 
 def clean_meta_value(value: str) -> str:
+    """Trim quotes and surrounding whitespace from a front matter value."""
+
     value = value.strip()
     if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
         return value[1:-1]
@@ -112,6 +130,8 @@ def clean_meta_value(value: str) -> str:
 
 
 def inline_markdown(value: str) -> str:
+    """Render a small subset of inline Markdown to HTML."""
+
     escaped = html.escape(value)
     escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
@@ -120,7 +140,10 @@ def inline_markdown(value: str) -> str:
     return escaped
 
 
+# pylint: disable-next=too-many-locals,too-many-statements
 def markdown_to_html(markdown: str) -> str:
+    """Render supported Markdown blocks to HTML."""
+
     lines = markdown.splitlines()
     html_lines: list[str] = []
     paragraph: list[str] = []
@@ -146,8 +169,13 @@ def markdown_to_html(markdown: str) -> str:
 
         if stripped.startswith("```"):
             if in_code:
-                class_attr = f' class="language-{html.escape(code_lang)}"' if code_lang else ""
-                html_lines.append(f"<pre><code{class_attr}>{html.escape(chr(10).join(code_lines))}</code></pre>")
+                class_attr = (
+                    f' class="language-{html.escape(code_lang)}"' if code_lang else ""
+                )
+                html_lines.append(
+                    f"<pre><code{class_attr}>"
+                    f"{html.escape(chr(10).join(code_lines))}</code></pre>"
+                )
                 in_code = False
                 code_lang = ""
                 code_lines = []
@@ -172,14 +200,18 @@ def markdown_to_html(markdown: str) -> str:
             flush_paragraph()
             close_list()
             level = len(heading.group(1))
-            html_lines.append(f"<h{level}>{inline_markdown(heading.group(2))}</h{level}>")
+            html_lines.append(
+                f"<h{level}>{inline_markdown(heading.group(2))}</h{level}>"
+            )
             continue
 
         quote = re.match(r"^>\s?(.+)$", stripped)
         if quote:
             flush_paragraph()
             close_list()
-            html_lines.append(f"<blockquote><p>{inline_markdown(quote.group(1))}</p></blockquote>")
+            html_lines.append(
+                f"<blockquote><p>{inline_markdown(quote.group(1))}</p></blockquote>"
+            )
             continue
 
         unordered = re.match(r"^-\s+(.+)$", stripped)
@@ -211,12 +243,16 @@ def markdown_to_html(markdown: str) -> str:
 
 
 def estimate_read_time(markdown: str) -> str:
+    """Estimate reading time from Markdown word count."""
+
     words = re.findall(r"\b\w+\b", re.sub(r"```.*?```", "", markdown, flags=re.DOTALL))
     minutes = max(1, round(len(words) / 220))
     return f"{minutes} min"
 
 
 def load_posts() -> list[Post]:
+    """Load, parse, and sort all blog posts from the source directory."""
+
     posts: list[Post] = []
     for source_path in sorted(BLOG_SOURCE_DIR.glob("*.md")):
         if source_path.name.lower() == "readme.md":
@@ -229,7 +265,9 @@ def load_posts() -> list[Post]:
         title = str(meta.get("title") or source_path.stem.replace("-", " ").title())
         description = str(meta.get("description") or "")
         date = str(meta.get("date") or "1970-01-01")
-        read_time = str(meta.get("readTime") or meta.get("read_time") or estimate_read_time(body))
+        read_time = str(
+            meta.get("readTime") or meta.get("read_time") or estimate_read_time(body)
+        )
         tags_value = meta.get("tags") or []
         tags = [str(tag) for tag in tags_value] if isinstance(tags_value, list) else []
         slug = slugify(str(meta.get("slug") or source_path.stem))
@@ -249,19 +287,25 @@ def load_posts() -> list[Post]:
 
 
 def roman(index: int) -> str:
+    """Return a small Roman numeral for a zero-based index."""
+
     numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
     return numerals[index] if index < len(numerals) else str(index + 1)
 
 
 def render_post(post: Post, index: int) -> str:
-    tags = "\n".join(f"            <span>{html.escape(tag)}</span>" for tag in post.tags)
+    """Render a single blog post as a full HTML page."""
+
+    tags = "\n".join(
+        f"            <span>{html.escape(tag)}</span>" for tag in post.tags
+    )
     title = html.escape(post.title)
     description = html.escape(post.description)
     date = html.escape(post.display_date)
     read_time = html.escape(post.read_time)
     numeral = roman(index)
 
-    return f'''<!doctype html>
+    return f"""<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -286,9 +330,27 @@ def render_post(post: Post, index: int) -> str:
       <div class="nav-left"></div>
       <div class="nav-links">
         <div class="accent-picker" aria-label="Choose accent colour">
-          <button class="accent-option accent-option-red" type="button" data-accent="red" aria-label="Use red accent" title="Red"></button>
-          <button class="accent-option accent-option-gold" type="button" data-accent="gold" aria-label="Use gold accent" title="Gold"></button>
-          <button class="accent-option accent-option-obsidian" type="button" data-accent="obsidian" aria-label="Use purple accent" title="Purple"></button>
+          <button
+            class="accent-option accent-option-red"
+            type="button"
+            data-accent="red"
+            aria-label="Use red accent"
+            title="Red"
+          ></button>
+          <button
+            class="accent-option accent-option-gold"
+            type="button"
+            data-accent="gold"
+            aria-label="Use gold accent"
+            title="Gold"
+          ></button>
+          <button
+            class="accent-option accent-option-obsidian"
+            type="button"
+            data-accent="obsidian"
+            aria-label="Use purple accent"
+            title="Purple"
+          ></button>
         </div>
         <a href="../index.html#work" class="nav-link">Experience</a>
         <a href="../index.html#projects" class="nav-link">Projects</a>
@@ -302,7 +364,9 @@ def render_post(post: Post, index: int) -> str:
         <a href="../index.html#writing" class="project-link">&larr; Back to posts</a>
 
         <header class="post-header">
-          <div class="section-label"><span class="section-numeral">{numeral}</span> / {date} / {read_time}</div>
+          <div class="section-label">
+            <span class="section-numeral">{numeral}</span> / {date} / {read_time}
+          </div>
           <h1 class="section-heading">{title}.</h1>
           <p class="hero-tagline post-description">{description}</p>
           <div class="post-tags" aria-label="Tags">
@@ -325,7 +389,10 @@ def render_post(post: Post, index: int) -> str:
           document.documentElement.setAttribute("data-accent", accent);
           localStorage.setItem("accentTheme", accent);
           options.forEach(function (option) {{
-            option.classList.toggle("accent-option-active", option.getAttribute("data-accent") === accent);
+            option.classList.toggle(
+              "accent-option-active",
+              option.getAttribute("data-accent") === accent
+            );
           }});
         }}
 
@@ -340,14 +407,16 @@ def render_post(post: Post, index: int) -> str:
     </script>
   </body>
 </html>
-'''
+"""
 
 
 def render_index_rows(posts: list[Post]) -> str:
+    """Render the homepage blog list rows."""
+
     if not posts:
-        return '''      <div class="writing-placeholder reveal" data-delay="40">
+        return """      <div class="writing-placeholder reveal" data-delay="40">
         <p>Posts coming soon.</p>
-      </div>'''
+      </div>"""
 
     rows: list[str] = []
     last_index = len(posts) - 1
@@ -355,25 +424,33 @@ def render_index_rows(posts: list[Post]) -> str:
         classes = "writing-row reveal"
         if index == last_index:
             classes += " writing-row-last"
-        rows.append(
-            f'''      <a href="{post.href_from_index}" class="{classes}" data-delay="{40 + (index * 60)}">
+        rows.append(f"""      <a
+        href="{post.href_from_index}"
+        class="{classes}"
+        data-delay="{40 + (index * 60)}"
+      >
         <span class="writing-num">{roman(index)}</span>
         <span class="writing-date">{html.escape(post.display_date)}</span>
         <span class="writing-title">{html.escape(post.title)}</span>
         <span class="writing-time">{html.escape(post.read_time)}</span>
         <span class="writing-arrow">&rarr;</span>
-      </a>'''
-        )
+      </a>""")
     return "\n".join(rows)
 
 
 def update_index(posts: list[Post]) -> None:
+    """Replace the homepage blog listing with generated rows."""
+
     index_html = INDEX_FILE.read_text(encoding="utf-8")
     rendered = render_index_rows(posts)
 
     if START_MARKER not in index_html or END_MARKER not in index_html:
+        listing_pattern = (
+            r"      (?:<div class=\"writing-placeholder[\s\S]*?</div>"
+            r"|<a href=\"posts/[\s\S]*?</a>)"
+        )
         index_html = re.sub(
-            r"      (?:<div class=\"writing-placeholder[\s\S]*?</div>|<a href=\"posts/[\s\S]*?</a>)",
+            listing_pattern,
             f"      {START_MARKER}\n{rendered}\n      {END_MARKER}",
             index_html,
             count=1,
@@ -390,6 +467,8 @@ def update_index(posts: list[Post]) -> None:
 
 
 def main() -> None:
+    """Build posts and update the homepage listing."""
+
     BLOG_SOURCE_DIR.mkdir(parents=True, exist_ok=True)
     POST_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 

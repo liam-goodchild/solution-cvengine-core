@@ -792,7 +792,6 @@ img {
   letter-spacing: 1px;
 }
 
-
 /* ── Blog Post ───────────────────────────────────────────────── */
 .post-page {
   padding: 96px 64px;
@@ -962,8 +961,6 @@ img {
   flex-shrink: 0;
 }
 
-
-
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .work-item {
@@ -1075,7 +1072,6 @@ img {
     flex-direction: column;
     align-items: center;
   }
-
 }
 
 @media (max-width: 600px) {
@@ -1131,5 +1127,3 @@ img {
     text-align: center;
   }
 }
-
-
