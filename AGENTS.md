@@ -51,7 +51,7 @@ Browser → Azure Static Web App (frontend/) → Azure Function API (`/api/Updat
 - `infra/vars/dev.tfvars` — dev
 - `infra/vars/prd.tfvars` — prd
 
-Terraform: `>= 1.0, < 2.0` (CI pins `1.9.8`). Providers: `azurerm >= 4.0 < 5.0`, `azuread >= 3.0 < 4.0`.
+Terraform: `1.15.3` (CI pins `1.15.3`). Providers: `azurerm >= 4.0 < 5.0`, `azuread >= 3.0 < 4.0`.
 
 ### CI/CD (GitHub Actions)
 
