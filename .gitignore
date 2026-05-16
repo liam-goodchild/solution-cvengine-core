@@ -1,12 +1,6 @@
 # Local .terraform directories
 **/.terraform/*
 
-# Commit Terraform provider lock files
-!.terraform.lock.hcl
-
-# Track tfvars in this repo (global gitignore ignores *.tfvars)
-!infra/vars/*.tfvars
-
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -27,6 +21,7 @@ override.tf.json
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
+*.tfplan
 
 # Ignore CLI configuration files
 .terraformrc
