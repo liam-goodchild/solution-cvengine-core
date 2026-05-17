@@ -1,4 +1,17 @@
 {
   "generatedBy": "scripts/build_blog.py",
-  "posts": []
+  "posts": [
+    {
+      "slug": "workflow-email-test-20260517",
+      "title": "Workflow Email Test",
+      "description": "A temporary post used to test the blog publishing and Brevo email notification workflow.",
+      "date": "2026-05-17",
+      "displayDate": "MAY 2026",
+      "readTime": "1 min",
+      "tags": ["Test", "Brevo"],
+      "sourcePath": "docs/blog/workflow-email-test-20260517.md",
+      "outputPath": "frontend/posts/workflow-email-test-20260517.html",
+      "href": "posts/workflow-email-test-20260517.html"
+    }
+  ]
 }
