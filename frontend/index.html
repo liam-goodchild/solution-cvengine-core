@@ -477,16 +477,16 @@
           <label class="notify-label" for="notifyEmail"
             >Get notified by email</label
           >
-          <label class="notify-honeypot" for="notifyWebsite">
-            Leave this field empty
-            <input
-              id="notifyWebsite"
-              name="website"
-              type="text"
-              tabindex="-1"
-              autocomplete="off"
-            />
-          </label>
+          <input
+            class="notify-honeypot"
+            id="notifyWebsite"
+            name="website"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+            hidden
+          />
           <div class="notify-row">
             <input
               class="notify-input"

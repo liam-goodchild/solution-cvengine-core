@@ -747,6 +747,7 @@ img {
 }
 
 .notify-honeypot {
+  display: none !important;
   position: absolute;
   left: -100vw;
   width: 1px;
