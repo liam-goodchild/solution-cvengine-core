@@ -323,7 +323,6 @@ async function createAndSendBrevoCampaign(post, config) {
         listIds: [config.listId],
       },
       replyTo: config.replyTo || config.fromEmail,
-      tag: "portfolio-blog",
       mirrorActive: false,
     },
   });
