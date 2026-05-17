@@ -620,6 +620,10 @@ img {
   margin-bottom: 56px;
 }
 
+.writing-list {
+  margin-bottom: 32px;
+}
+
 .writing-row {
   display: grid;
   grid-template-columns: 60px 120px 1fr 80px 30px;
@@ -697,6 +701,10 @@ img {
     var(--bg-alt);
 }
 
+.writing-subscribe {
+  margin-top: 32px;
+}
+
 .writing-empty-kicker {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -736,6 +744,14 @@ img {
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--ink-faint);
+}
+
+.notify-honeypot {
+  position: absolute;
+  left: -100vw;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 .notify-row {
@@ -787,6 +803,17 @@ img {
   transform: translateY(-2px);
   border-color: var(--accent);
   box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.notify-btn:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.notify-btn:disabled:hover {
+  transform: none;
+  border-color: var(--rule-hi);
+  box-shadow: none;
 }
 
 .notify-output {

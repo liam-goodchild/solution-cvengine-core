@@ -3,6 +3,7 @@ title: "Example Blog Post Title"
 description: "A short one-line summary of what this post is about."
 date: "2026-04-24"
 readTime: "4 min"
+draft: true
 tags:
   - Azure
   - DevOps

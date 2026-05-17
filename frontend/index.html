@@ -453,22 +453,40 @@
         <div class="section-label"><span class="section-numeral">IV</span></div>
         <h2 class="section-heading">Blog.</h2>
       </div>
-      <div class="writing-empty reveal" data-delay="40">
+      <div class="writing-list" aria-label="Published blog posts">
+        <!-- BLOG_POSTS_START -->
+        <div class="writing-placeholder reveal" data-delay="40">
+          <p>Posts coming soon.</p>
+        </div>
+        <!-- BLOG_POSTS_END -->
+      </div>
+
+      <div class="writing-empty writing-subscribe reveal" data-delay="120">
         <div class="writing-empty-copy">
-          <p class="writing-empty-kicker">No posts live yet</p>
+          <p class="writing-empty-kicker">Get notified</p>
           <h3 class="writing-empty-title">
-            Stay tuned, the thinking is in progress.
+            New posts, no spam, no paid mailing stack.
           </h3>
           <p class="writing-empty-text">
-            The blog section is warming up. Leave your email and I’ll let you
-            know when the first post lands.
+            Leave your email and I’ll send a short note when a new post goes
+            live. You can unsubscribe from any email.
           </p>
         </div>
 
-        <form class="writing-interactive" id="notifyForm">
+        <form class="writing-interactive" id="notifyForm" novalidate>
           <label class="notify-label" for="notifyEmail"
             >Get notified by email</label
           >
+          <label class="notify-honeypot" for="notifyWebsite">
+            Leave this field empty
+            <input
+              id="notifyWebsite"
+              name="website"
+              type="text"
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </label>
           <div class="notify-row">
             <input
               class="notify-input"
@@ -482,7 +500,7 @@
             <button class="notify-btn" type="submit">Notify me</button>
           </div>
           <p class="notify-output" id="notifyOutput" aria-live="polite">
-            No spam, just a quick note when the blog goes live.
+            Powered by Brevo’s free tier and your explicit opt-in.
           </p>
         </form>
       </div>
@@ -711,29 +729,49 @@
         var form = document.getElementById("notifyForm");
         var output = document.getElementById("notifyOutput");
         var input = document.getElementById("notifyEmail");
+        var honeypot = document.getElementById("notifyWebsite");
+        var button = form ? form.querySelector(".notify-btn") : null;
         if (!form || !output || !input) return;
 
-        form.addEventListener("submit", function (e) {
+        form.addEventListener("submit", async function (e) {
           e.preventDefault();
           var email = input.value.trim();
-          if (!email) return;
+          if (!email || !input.checkValidity()) {
+            output.textContent = "Please enter a valid email address.";
+            input.focus();
+            return;
+          }
 
-          var subject = encodeURIComponent(
-            "Please notify me when the blog goes live",
-          );
-          var body = encodeURIComponent(
-            "Hi Liam,\n\nPlease let me know when the blog section starts publishing posts.\n\nMy email: " +
-              email +
-              "\n",
-          );
+          output.textContent = "Adding you to the list…";
+          if (button) button.disabled = true;
 
-          window.location.href =
-            "mailto:liamgoodchild12@hotmail.co.uk?subject=" +
-            subject +
-            "&body=" +
-            body;
-          output.textContent =
-            "Your email app should open with a notification request ready to send.";
+          try {
+            var response = await fetch("/api/Subscribe", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                email: email,
+                website: honeypot ? honeypot.value : "",
+              }),
+            });
+            var data = await response.json().catch(function () {
+              return {};
+            });
+
+            if (!response.ok) {
+              throw new Error(data.error || "Subscription failed");
+            }
+
+            form.reset();
+            output.textContent =
+              data.message ||
+              "Thanks — check your inbox when the next post goes live.";
+          } catch (error) {
+            output.textContent =
+              "Sorry, subscriptions are temporarily unavailable. Please try again later.";
+          } finally {
+            if (button) button.disabled = false;
+          }
         });
       })();
     </script>
