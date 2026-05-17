@@ -52,7 +52,9 @@ notifications.
 ## Email notifications
 
 Blog email notifications use Brevo's free tier. Subscriber emails are stored in
-Brevo, not Cosmos DB.
+Brevo, not Cosmos DB. Notifications are sent through Brevo's transactional email
+API to the contacts in the configured list, with a signed unsubscribe link that
+removes the recipient from that list.
 
 Required Azure Static Web App app settings:
 

@@ -225,6 +225,54 @@ async function getBrevoContactCount(listId) {
   return Number(result.count || 0);
 }
 
+async function getBrevoListContacts(listId, limit) {
+  const contacts = [];
+  let offset = 0;
+  const pageSize = Math.min(Math.max(limit, 1), 500);
+  let totalCount = 0;
+
+  while (contacts.length < limit) {
+    const result = await brevoRequest(
+      `/contacts/lists/${encodeURIComponent(String(listId))}/contacts` +
+        `?limit=${pageSize}&offset=${offset}`,
+    );
+    const pageContacts = Array.isArray(result.contacts) ? result.contacts : [];
+    totalCount = Number(result.count || totalCount || pageContacts.length);
+
+    for (const contact of pageContacts) {
+      if (contact.email && !contact.emailBlacklisted) {
+        contacts.push({ email: normalizeEmail(contact.email) });
+      }
+
+      if (contacts.length >= limit) {
+        break;
+      }
+    }
+
+    if (pageContacts.length < pageSize || contacts.length >= totalCount) {
+      break;
+    }
+
+    offset += pageSize;
+  }
+
+  return { contacts, totalCount };
+}
+
+function unsubscribeSignature(email, config) {
+  return crypto
+    .createHmac("sha256", config.notifySecret)
+    .update(normalizeEmail(email))
+    .digest("hex");
+}
+
+function unsubscribeUrl(email, config) {
+  const url = new URL("/api/Unsubscribe", config.publicSiteUrl);
+  url.searchParams.set("email", normalizeEmail(email));
+  url.searchParams.set("sig", unsubscribeSignature(email, config));
+  return url.toString();
+}
+
 function validatePostPayload(payload, config) {
   const slug = String(payload.slug || "").trim();
   const title = String(payload.title || "").trim();
@@ -312,35 +360,52 @@ function renderBlogNotificationHtml(post, config) {
 </html>`;
 }
 
-async function createAndSendBrevoCampaign(post, config) {
-  const htmlContent = renderBlogNotificationHtml(post, config);
-  const sender = config.senderId
-    ? { id: config.senderId }
-    : {
-        name: config.fromName,
-        email: config.fromEmail,
-      };
-  const campaign = await brevoRequest("/emailCampaigns", {
+function renderTransactionalBlogNotificationHtml(post, config, recipient) {
+  return renderBlogNotificationHtml(post, config).replace(
+    "{{ unsubscribe }}",
+    htmlEscape(unsubscribeUrl(recipient.email, config)),
+  );
+}
+
+function renderBlogNotificationText(post, config, recipient) {
+  return [
+    "New blog post",
+    "",
+    post.title,
+    "",
+    textFromHtml(post.description),
+    "",
+    `Read the post: ${post.url}`,
+    "",
+    `You are receiving this because you subscribed on ${config.publicSiteUrl}.`,
+    `Unsubscribe: ${unsubscribeUrl(recipient.email, config)}`,
+  ].join("\n");
+}
+
+async function sendBrevoTransactionalPostEmail(post, config, recipient) {
+  const result = await brevoRequest("/smtp/email", {
     method: "POST",
     body: {
-      name: `Portfolio blog: ${post.title}`,
-      sender,
-      subject: `New post: ${post.title}`,
-      previewText: textFromHtml(post.description).slice(0, 130),
-      htmlContent,
-      recipients: {
-        listIds: [config.listId],
+      sender: {
+        name: config.fromName,
+        email: config.fromEmail,
       },
-      replyTo: config.replyTo || config.fromEmail,
-      mirrorActive: false,
+      to: [{ email: recipient.email }],
+      subject: `New post: ${post.title}`,
+      htmlContent: renderTransactionalBlogNotificationHtml(
+        post,
+        config,
+        recipient,
+      ),
+      textContent: renderBlogNotificationText(post, config, recipient),
+      replyTo: {
+        name: config.fromName,
+        email: config.replyTo || config.fromEmail,
+      },
     },
   });
 
-  await brevoRequest(`/emailCampaigns/${campaign.id}/sendNow`, {
-    method: "POST",
-  });
-
-  return campaign;
+  return result.messageId;
 }
 
 app.http("UpdateVisitorCount", {
@@ -484,11 +549,34 @@ app.http("NotifyPost", {
         });
       }
 
-      const campaign = await createAndSendBrevoCampaign(post, config);
+      const { contacts } = await getBrevoListContacts(
+        config.listId,
+        config.dailyLimit + 1,
+      );
+
+      if (contacts.length > config.dailyLimit) {
+        return jsonResponse(409, {
+          error: "Brevo free-tier safety limit exceeded",
+          recipientCount: contacts.length,
+          dailyLimit: config.dailyLimit,
+        });
+      }
+
+      const messageIds = [];
+      for (const contact of contacts) {
+        const messageId = await sendBrevoTransactionalPostEmail(
+          post,
+          config,
+          contact,
+        );
+        messageIds.push(messageId);
+      }
+
       const record = await writeNotification(container, post.slug, {
         status: "sent",
-        recipientCount,
-        brevoCampaignId: campaign.id,
+        recipientCount: contacts.length,
+        deliveryMode: "brevo-transactional",
+        sampleMessageIds: messageIds.slice(0, 10),
         sentAt: new Date().toISOString(),
         post,
       });
@@ -496,8 +584,7 @@ app.http("NotifyPost", {
       return jsonResponse(200, {
         status: record.status,
         slug: post.slug,
-        recipientCount,
-        brevoCampaignId: campaign.id,
+        recipientCount: contacts.length,
       });
     } catch (error) {
       console.error("Failed to notify blog subscribers:", error?.message ?? error);
@@ -507,6 +594,58 @@ app.http("NotifyPost", {
         error: "Blog notification failed",
         message: error?.message,
       });
+    }
+  },
+});
+
+app.http("Unsubscribe", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "Unsubscribe",
+  handler: async (request) => {
+    const config = getEmailConfig();
+    const email = normalizeEmail(request.query.get("email"));
+    const suppliedSignature = String(request.query.get("sig") || "");
+
+    try {
+      validateBrevoNotificationConfig(config);
+
+      if (!isValidEmail(email)) {
+        return {
+          status: 400,
+          headers: { "content-type": "text/html; charset=utf-8" },
+          body: "<h1>Invalid unsubscribe link</h1><p>The email address is missing or invalid.</p>",
+        };
+      }
+
+      if (!safeEquals(suppliedSignature, unsubscribeSignature(email, config))) {
+        return {
+          status: 400,
+          headers: { "content-type": "text/html; charset=utf-8" },
+          body: "<h1>Invalid unsubscribe link</h1><p>The link signature could not be verified.</p>",
+        };
+      }
+
+      await brevoRequest(`/contacts/${encodeURIComponent(email)}`, {
+        method: "PUT",
+        body: {
+          unlinkListIds: [config.listId],
+        },
+      });
+
+      return {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+        body: "<h1>You’re unsubscribed</h1><p>You have been removed from Sky Haven blog notifications.</p>",
+      };
+    } catch (error) {
+      console.error("Failed to unsubscribe contact:", error?.message ?? error);
+
+      return {
+        status: 500,
+        headers: { "content-type": "text/html; charset=utf-8" },
+        body: "<h1>Unsubscribe failed</h1><p>Please try again later.</p>",
+      };
     }
   },
 });
