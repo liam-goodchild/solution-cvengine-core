@@ -3,7 +3,7 @@ title: Python Helpers for Faster Agent Skills
 description: Why I am moving repeatable skill work into Python helpers so Claude and Codex spend fewer tokens on chores.
 date: 2026-05-17
 slug: python-helpers-for-faster-agent-skills
-draft: true
+draft: false
 tags:
   - AI
   - Automation
