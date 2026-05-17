@@ -30,7 +30,10 @@ function getEnv(...names) {
 
 function getEmailConfig() {
   const listId = Number.parseInt(getEnv("BREVO_LIST_ID", "BrevoListId"), 10);
-  const senderId = Number.parseInt(getEnv("BREVO_SENDER_ID", "BrevoSenderId"), 10);
+  const senderId = Number.parseInt(
+    getEnv("BREVO_SENDER_ID", "BrevoSenderId"),
+    10,
+  );
   const dailyLimit = Number.parseInt(
     getEnv("EMAIL_DAILY_LIMIT", "EmailDailyLimit") ||
       String(DEFAULT_EMAIL_DAILY_LIMIT),
@@ -57,7 +60,11 @@ function getEmailConfig() {
 }
 
 function validateBrevoSubscriptionConfig(config) {
-  if (!config.apiKey || !Number.isInteger(config.listId) || config.listId <= 0) {
+  if (
+    !config.apiKey ||
+    !Number.isInteger(config.listId) ||
+    config.listId <= 0
+  ) {
     throw new Error("Missing Brevo subscription configuration");
   }
 }
@@ -83,7 +90,9 @@ async function parseJsonBody(request) {
 }
 
 function normalizeEmail(email) {
-  return String(email || "").trim().toLowerCase();
+  return String(email || "")
+    .trim()
+    .toLowerCase();
 }
 
 function isValidEmail(email) {
@@ -278,7 +287,9 @@ function validatePostPayload(payload, config) {
   const title = String(payload.title || "").trim();
   const description = String(payload.description || "").trim();
   const url = String(payload.url || "").trim();
-  const publishedDate = String(payload.publishedDate || payload.date || "").trim();
+  const publishedDate = String(
+    payload.publishedDate || payload.date || "",
+  ).trim();
 
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
     throw new Error("slug must be URL-safe kebab-case");
@@ -460,7 +471,9 @@ app.http("Subscribe", {
     }
 
     if (!isValidEmail(email)) {
-      return jsonResponse(400, { error: "Please enter a valid email address." });
+      return jsonResponse(400, {
+        error: "Please enter a valid email address.",
+      });
     }
 
     if (isSubscribeRateLimited(request)) {
@@ -587,7 +600,10 @@ app.http("NotifyPost", {
         recipientCount: contacts.length,
       });
     } catch (error) {
-      console.error("Failed to notify blog subscribers:", error?.message ?? error);
+      console.error(
+        "Failed to notify blog subscribers:",
+        error?.message ?? error,
+      );
 
       const status = error.message?.startsWith("Missing") ? 503 : 400;
       return jsonResponse(status, {

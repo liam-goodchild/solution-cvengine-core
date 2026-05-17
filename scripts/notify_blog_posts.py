@@ -109,7 +109,7 @@ def select_posts(
     return [post for post in posts if post.get("sourcePath") in changed_sources]
 
 
-def notify_post(  # pylint: disable=too-many-arguments
+def notify_post(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     post: dict[str, Any],
     site_url: str,
     notify_url: str,

@@ -332,11 +332,7 @@ img {
   min-width: 0;
   border: 1px solid rgba(255, 255, 255, 0.045);
   background:
-    radial-gradient(
-      circle at 0% 0%,
-      var(--accent-glow),
-      transparent 34%
-    ),
+    radial-gradient(circle at 0% 0%, var(--accent-glow), transparent 34%),
     linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.035),
