@@ -141,10 +141,13 @@ function htmlEscape(value) {
 }
 
 function textFromHtml(value) {
-  return String(value ?? "")
-    .replace(/<[^>]*>/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  let text = String(value ?? "");
+  let previous;
+  do {
+    previous = text;
+    text = text.replace(/<[^>]*>/g, "");
+  } while (text !== previous);
+  return text.replace(/\s+/g, " ").trim();
 }
 
 async function brevoRequest(path, options = {}) {
