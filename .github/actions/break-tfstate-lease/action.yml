@@ -48,7 +48,7 @@ runs:
           --output tsv 2>/dev/null || echo "missing")
 
         if [[ "$LEASE_STATE" == "leased" ]]; then
-          echo "Active lease found — breaking..."
+          echo "Active lease found, breaking..."
           az storage blob lease break \
             --account-name "$STORAGE_ACCOUNT_NAME" \
             --container-name "$CONTAINER_NAME" \
