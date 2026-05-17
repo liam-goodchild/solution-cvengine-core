@@ -11,6 +11,7 @@ on:
       - "functions/**"
       - "docs/blog/**"
       - "scripts/build_blog.py"
+      - "scripts/notify_blog_posts.py"
   workflow_dispatch:
     inputs:
       environment:
@@ -19,6 +20,17 @@ on:
         required: true
         default: dev
         options: [dev, prd]
+      notify_posts:
+        description: "Blog post notification mode"
+        type: choice
+        required: true
+        default: none
+        options: [none, changed, all]
+      deploy_site:
+        description: "Deploy the Static Web App before notifying"
+        type: boolean
+        required: true
+        default: true
 
 permissions:
   id-token: write
@@ -29,9 +41,13 @@ jobs:
     name: Deploy to SWA
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment || 'prd' }}
+    env:
+      SWA_NAME: stapp-cvengine-${{ inputs.environment || 'prd' }}-uks-01
+      SWA_RESOURCE_GROUP: rg-cvengine-${{ inputs.environment || 'prd' }}-uks-01
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - uses: actions/setup-node@v4
@@ -42,6 +58,7 @@ jobs:
         run: python scripts/build_blog.py
 
       - name: Install API dependencies
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.deploy_site }}
         run: npm ci
         working-directory: functions
 
@@ -55,14 +72,66 @@ jobs:
       - name: Fetch SWA deployment token
         id: swa-token
         run: |
+          set -euo pipefail
           TOKEN=$(az staticwebapp secrets list \
-            --name "stapp-cvengine-prd-uks-01" \
-            --resource-group "rg-cvengine-prd-uks-01" \
+            --name "${SWA_NAME}" \
+            --resource-group "${SWA_RESOURCE_GROUP}" \
             --query "properties.apiKey" -o tsv)
+          DEFAULT_HOSTNAME=$(az staticwebapp show \
+            --name "${SWA_NAME}" \
+            --resource-group "${SWA_RESOURCE_GROUP}" \
+            --query "defaultHostname" -o tsv)
           echo "::add-mask::$TOKEN"
           echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+          echo "default_hostname=$DEFAULT_HOSTNAME" >> "$GITHUB_OUTPUT"
+
+      - name: Configure blog email app settings
+        env:
+          BLOG_NOTIFY_SECRET: ${{ secrets.BLOG_NOTIFY_SECRET }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ vars.BREVO_LIST_ID }}
+          BREVO_SENDER_ID: ${{ vars.BREVO_SENDER_ID }}
+          EMAIL_DAILY_LIMIT: ${{ vars.EMAIL_DAILY_LIMIT || '250' }}
+          EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+          EMAIL_FROM_NAME: ${{ vars.EMAIL_FROM_NAME || 'Liam Goodchild' }}
+          EMAIL_REPLY_TO: ${{ vars.EMAIL_REPLY_TO }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://skyhaven.ltd' }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${BLOG_NOTIFY_SECRET}" ] \
+            || [ -z "${BREVO_API_KEY}" ] \
+            || [ -z "${BREVO_LIST_ID}" ] \
+            || [ -z "${EMAIL_FROM}" ]; then
+            echo "Brevo settings are incomplete; skipping blog email app settings."
+            exit 0
+          fi
+
+          settings=(
+            "BLOG_NOTIFY_SECRET=${BLOG_NOTIFY_SECRET}"
+            "BREVO_API_KEY=${BREVO_API_KEY}"
+            "BREVO_LIST_ID=${BREVO_LIST_ID}"
+            "EMAIL_DAILY_LIMIT=${EMAIL_DAILY_LIMIT}"
+            "EMAIL_FROM=${EMAIL_FROM}"
+            "EMAIL_FROM_NAME=${EMAIL_FROM_NAME}"
+            "PUBLIC_SITE_URL=${PUBLIC_SITE_URL}"
+          )
+
+          if [ -n "${EMAIL_REPLY_TO}" ]; then
+            settings+=("EMAIL_REPLY_TO=${EMAIL_REPLY_TO}")
+          fi
+
+          if [ -n "${BREVO_SENDER_ID}" ]; then
+            settings+=("BREVO_SENDER_ID=${BREVO_SENDER_ID}")
+          fi
+
+          az staticwebapp appsettings set \
+            --name "${SWA_NAME}" \
+            --resource-group "${SWA_RESOURCE_GROUP}" \
+            --setting-names "${settings[@]}"
 
       - name: Deploy Static Web App
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.deploy_site }}
         uses: azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # v1
         env:
           NODE_VERSION: "20"
@@ -73,3 +142,24 @@ jobs:
           app_location: frontend
           api_location: functions
           output_location: ""
+
+      - name: Notify blog subscribers
+        env:
+          BLOG_NOTIFY_ON_PUSH: ${{ vars.BLOG_NOTIFY_ON_PUSH || 'false' }}
+          BLOG_NOTIFY_SECRET: ${{ secrets.BLOG_NOTIFY_SECRET }}
+          BLOG_NOTIFY_URL: https://${{ steps.swa-token.outputs.default_hostname }}/api/NotifyPost
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          NOTIFY_POSTS_INPUT: ${{ inputs.notify_posts || 'none' }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://skyhaven.ltd' }}
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            notify_mode="${NOTIFY_POSTS_INPUT}"
+          elif [ "${BLOG_NOTIFY_ON_PUSH}" = "true" ]; then
+            notify_mode="changed"
+          else
+            notify_mode="none"
+          fi
+
+          python scripts/notify_blog_posts.py --mode "${notify_mode}"

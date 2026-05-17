@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sky Haven — Liam Goodchild</title>
+    <title>Sky Haven - Liam Goodchild</title>
     <meta
       name="description"
       content="Senior Azure DevOps Engineer specializing in infrastructure automation, DevSecOps, and secure cloud architecture. AZ-400, AZ-305, AZ-104 certified."
@@ -29,64 +29,115 @@
       <div class="nav-links">
         <div class="visitor-mini" aria-label="Visitor count">
           <span class="visitor-mini-label">Visitors</span>
-          <span class="visitor-mini-value" id="visitorCount">—</span>
-        </div>
-        <div class="accent-picker" aria-label="Choose accent colour">
-          <button
-            class="accent-option accent-option-red"
-            type="button"
-            data-accent="red"
-            aria-label="Use red accent"
-            title="Red"
-          ></button>
-          <button
-            class="accent-option accent-option-gold"
-            type="button"
-            data-accent="gold"
-            aria-label="Use gold accent"
-            title="Gold"
-          ></button>
-          <button
-            class="accent-option accent-option-obsidian"
-            type="button"
-            data-accent="obsidian"
-            aria-label="Use purple accent"
-            title="Purple"
-          ></button>
+          <span class="visitor-mini-value" id="visitorCount">-</span>
         </div>
         <a href="#work" class="nav-link">Experience</a>
         <a href="#projects" class="nav-link">Projects</a>
-        <a href="#writing" class="nav-link">Blog</a>
         <a href="#contact" class="nav-link">Contact</a>
+      </div>
+      <div class="accent-picker" aria-label="Choose accent colour">
+        <button
+          class="accent-option accent-option-red"
+          type="button"
+          data-accent="red"
+          aria-label="Use red accent"
+          title="Red"
+        ></button>
+        <button
+          class="accent-option accent-option-gold"
+          type="button"
+          data-accent="gold"
+          aria-label="Use gold accent"
+          title="Gold"
+        ></button>
+        <button
+          class="accent-option accent-option-obsidian"
+          type="button"
+          data-accent="obsidian"
+          aria-label="Use purple accent"
+          title="Purple"
+        ></button>
       </div>
     </nav>
 
     <!-- Hero -->
     <section class="hero" id="top">
-      <div class="reveal">
-        <div class="hero-status">
-          <div class="hero-status-dot"></div>
-          <span class="hero-status-label">Currently —</span>
-          <span class="typed-role" id="typedRole"></span>
-          <span class="typed-cursor"></span>
-        </div>
-      </div>
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <div class="reveal">
+            <div class="hero-status">
+              <div class="hero-status-dot"></div>
+              <span class="hero-status-label">Currently</span>
+              <span class="typed-role" id="typedRole"></span>
+              <span class="typed-cursor"></span>
+            </div>
+          </div>
 
-      <div class="reveal" data-delay="120">
-        <h1 class="hero-name">
-          Liam<br />
-          <span class="hero-name-dim">Goodchild.</span>
-        </h1>
-      </div>
+          <div class="reveal" data-delay="120">
+            <h1 class="hero-name">
+              Liam<br />
+              <span class="hero-name-dim">Goodchild.</span>
+            </h1>
+          </div>
 
-      <div class="reveal" data-delay="360">
-        <div class="hero-tagline-wrap">
-          <p class="hero-tagline">
-            Architecting and automating cloud environments using Infrastructure
-            as Code. Specialising in Azure, DevSecOps, and CI/CD pipelines for
-            private and public sector organisations.
-          </p>
+          <div class="reveal" data-delay="360">
+            <div class="hero-tagline-wrap">
+              <p class="hero-tagline">
+                Architecting and automating cloud environments using
+                Infrastructure as Code. Specialising in Azure, DevSecOps, and
+                CI/CD pipelines for private and public sector organisations.
+              </p>
+            </div>
+          </div>
         </div>
+
+        <aside class="hero-blog reveal" data-delay="240" aria-label="Blog">
+          <div class="hero-blog-subscribe">
+            <p class="hero-blog-kicker">Blog updates</p>
+            <h2 class="hero-blog-heading">New posts, direct to your inbox.</h2>
+            <p class="hero-blog-copy">
+              Short notes on Azure, DevSecOps, automation, and the lessons
+              learnt along the way.
+            </p>
+
+            <form class="notify-form hero-notify-form" novalidate>
+              <label class="notify-label" for="heroNotifyEmail"
+                >Subscribe to posts</label
+              >
+              <input
+                class="notify-honeypot"
+                name="website"
+                type="text"
+                tabindex="-1"
+                autocomplete="off"
+              />
+              <div class="notify-row">
+                <input
+                  class="notify-input"
+                  id="heroNotifyEmail"
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                  required
+                />
+                <button class="notify-btn" type="submit">Send</button>
+              </div>
+              <p class="notify-output" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+
+          <div class="hero-blog-posts" aria-label="Recent blog posts">
+            <div class="hero-blog-posts-header">
+              <span>Recent posts</span>
+            </div>
+            <div class="hero-blog-post-list">
+              <!-- HERO_BLOG_POSTS_START -->
+              <div class="hero-blog-placeholder">Posts coming soon.</div>
+              <!-- HERO_BLOG_POSTS_END -->
+            </div>
+          </div>
+        </aside>
       </div>
     </section>
 
@@ -108,7 +159,7 @@
         <div class="work-item">
           <div class="work-numeral work-numeral-active">I</div>
           <div class="work-meta">
-            <div class="work-date work-date-active">Oct 2025 — Present</div>
+            <div class="work-date work-date-active">Oct 2025 to Present</div>
             <h3 class="work-company">Version 1</h3>
             <div class="work-role">Senior Azure DevOps Engineer</div>
           </div>
@@ -174,7 +225,7 @@
         <div class="work-item">
           <div class="work-numeral">II</div>
           <div class="work-meta">
-            <div class="work-date">Sep 2024 — Oct 2025</div>
+            <div class="work-date">Sep 2024 to Oct 2025</div>
             <h3 class="work-company">Redcentric</h3>
             <div class="work-role">Azure Cloud Engineer</div>
           </div>
@@ -219,7 +270,7 @@
         <div class="work-item">
           <div class="work-numeral">III</div>
           <div class="work-meta">
-            <div class="work-date">2023 — 2024</div>
+            <div class="work-date">2023 to 2024</div>
             <h3 class="work-company">Marks &amp; Clerk</h3>
             <div class="work-role">Infrastructure Engineer</div>
           </div>
@@ -248,7 +299,7 @@
         <div class="work-item">
           <div class="work-numeral">IV</div>
           <div class="work-meta">
-            <div class="work-date">2022 — 2023</div>
+            <div class="work-date">2022 to 2023</div>
             <h3 class="work-company">Midland Heart</h3>
             <div class="work-role">IT Engineer</div>
           </div>
@@ -283,64 +334,60 @@
       </div>
       <div class="projects-grid">
         <div class="reveal" data-delay="0">
-          <article class="project-card">
+          <a
+            href="https://github.com/liam-goodchild/solution-cvengine-portfolio"
+            target="_blank"
+            class="project-card"
+          >
             <h3 class="project-title">CVEngine</h3>
             <p class="project-desc">
               Serverless portfolio infrastructure hosting this site. Azure
               Static Web Apps, Functions for API endpoints, CosmosDB for state.
             </p>
-            <a
-              href="https://github.com/liam-goodchild/solution-cvengine-portfolio"
-              target="_blank"
-              class="project-link"
-              >View on GitHub &rarr;</a
-            >
-          </article>
+            <span class="project-link">View on GitHub &rarr;</span>
+          </a>
         </div>
         <div class="reveal" data-delay="100">
-          <article class="project-card project-card-bordered">
+          <a
+            href="https://github.com/liam-goodchild/solution-braveart-gallery"
+            target="_blank"
+            class="project-card project-card-bordered"
+          >
             <h3 class="project-title">BraveArt</h3>
             <p class="project-desc">
               Commerce website for selling artwork, powered by Stripe for
               payments and order management.
             </p>
-            <a
-              href="https://github.com/liam-goodchild/solution-braveart-gallery"
-              target="_blank"
-              class="project-link"
-              >View on GitHub &rarr;</a
-            >
-          </article>
+            <span class="project-link">View on GitHub &rarr;</span>
+          </a>
         </div>
         <div class="reveal" data-delay="200">
-          <article class="project-card project-card-bordered">
+          <a
+            href="https://github.com/liam-goodchild/solution-powertoggle-vm"
+            target="_blank"
+            class="project-card project-card-bordered"
+          >
             <h3 class="project-title">PowerToggle</h3>
             <p class="project-desc">
               Azure VM power automation. Uses resource tags to schedule
               automatic start/stop without infrastructure code changes.
             </p>
-            <a
-              href="https://github.com/liam-goodchild/solution-powertoggle-vm"
-              target="_blank"
-              class="project-link"
-              >View on GitHub &rarr;</a
-            >
-          </article>
+            <span class="project-link">View on GitHub &rarr;</span>
+          </a>
         </div>
         <div class="reveal" data-delay="300">
-          <article class="project-card project-card-bordered">
+          <a
+            href="https://github.com/liam-goodchild/solution-certwatch-web"
+            target="_blank"
+            class="project-card project-card-bordered"
+          >
             <h3 class="project-title">CertWatch</h3>
             <p class="project-desc">
               Automated notification system tracking IT certification expiry
-              dates — email and SMS reminders.
+              dates, with email and SMS reminders.
             </p>
-            <a
-              href="https://github.com/liam-goodchild/solution-certwatch-web"
-              target="_blank"
-              class="project-link"
-              >View on GitHub &rarr;</a
-            >
-          </article>
+            <span class="project-link">View on GitHub &rarr;</span>
+          </a>
         </div>
       </div>
     </section>
@@ -444,47 +491,6 @@
             <div class="cert-issuer cert-issuer-accent">COMPTIA</div>
           </a>
         </div>
-      </div>
-    </section>
-
-    <!-- Writing -->
-    <section class="writing" id="writing">
-      <div class="reveal">
-        <div class="section-label"><span class="section-numeral">IV</span></div>
-        <h2 class="section-heading">Blog.</h2>
-      </div>
-      <div class="writing-empty reveal" data-delay="40">
-        <div class="writing-empty-copy">
-          <p class="writing-empty-kicker">No posts live yet</p>
-          <h3 class="writing-empty-title">
-            Stay tuned, the thinking is in progress.
-          </h3>
-          <p class="writing-empty-text">
-            The blog section is warming up. Leave your email and I’ll let you
-            know when the first post lands.
-          </p>
-        </div>
-
-        <form class="writing-interactive" id="notifyForm">
-          <label class="notify-label" for="notifyEmail"
-            >Get notified by email</label
-          >
-          <div class="notify-row">
-            <input
-              class="notify-input"
-              id="notifyEmail"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            />
-            <button class="notify-btn" type="submit">Notify me</button>
-          </div>
-          <p class="notify-output" id="notifyOutput" aria-live="polite">
-            No spam, just a quick note when the blog goes live.
-          </p>
-        </form>
       </div>
     </section>
 
@@ -708,32 +714,53 @@
 
       // ── Notify Me Form ────────────────────────────────────────────
       (function () {
-        var form = document.getElementById("notifyForm");
-        var output = document.getElementById("notifyOutput");
-        var input = document.getElementById("notifyEmail");
-        if (!form || !output || !input) return;
+        document.querySelectorAll(".notify-form").forEach(function (form) {
+          var output = form.querySelector(".notify-output");
+          var input = form.querySelector('input[name="email"]');
+          var honeypot = form.querySelector('input[name="website"]');
+          var button = form.querySelector(".notify-btn");
+          if (!output || !input) return;
 
-        form.addEventListener("submit", function (e) {
-          e.preventDefault();
-          var email = input.value.trim();
-          if (!email) return;
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            var email = input.value.trim();
+            if (!email || !input.checkValidity()) {
+              output.textContent = "Please enter a valid email address.";
+              input.focus();
+              return;
+            }
 
-          var subject = encodeURIComponent(
-            "Please notify me when the blog goes live",
-          );
-          var body = encodeURIComponent(
-            "Hi Liam,\n\nPlease let me know when the blog section starts publishing posts.\n\nMy email: " +
-              email +
-              "\n",
-          );
+            output.textContent = "Adding you to the list…";
+            if (button) button.disabled = true;
 
-          window.location.href =
-            "mailto:liamgoodchild12@hotmail.co.uk?subject=" +
-            subject +
-            "&body=" +
-            body;
-          output.textContent =
-            "Your email app should open with a notification request ready to send.";
+            try {
+              var response = await fetch("/api/Subscribe", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                  email: email,
+                  website: honeypot ? honeypot.value : "",
+                }),
+              });
+              var data = await response.json().catch(function () {
+                return {};
+              });
+
+              if (!response.ok) {
+                throw new Error(data.error || "Subscription failed");
+              }
+
+              form.reset();
+              output.textContent =
+                data.message ||
+                "Thanks, check your inbox when the next post goes live.";
+            } catch (error) {
+              output.textContent =
+                "Sorry, subscriptions are temporarily unavailable. Please try again later.";
+            } finally {
+              if (button) button.disabled = false;
+            }
+          });
         });
       })();
     </script>

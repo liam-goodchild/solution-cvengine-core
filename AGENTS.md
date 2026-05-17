@@ -6,9 +6,9 @@ This file provides guidance to Codex CLI and other AI coding agents when working
 
 CVEngine is a serverless portfolio site hosted on Azure. Three components:
 
-- **frontend/** — Static HTML/CSS/JS portfolio site (vanilla CSS, no framework, no build step). Space Grotesk + JetBrains Mono fonts, Font Awesome 6.3.0, AOS scroll animations.
-- **functions/** — Node.js 18.x Azure Function (`UpdateVisitorCount`, GET/POST) tracking visitors in Cosmos DB. Runtime v2.0. Cosmos connection via `COSMOSDB_CONNECTION_STRING`.
-- **infra/** — Terraform IaC: Resource Group, Static Web App + custom domain, Cosmos DB (SQL API, free tier), DNS CNAME on existing zone.
+- **frontend/** - Static HTML/CSS/JS portfolio site (vanilla CSS, no framework, no build step). Space Grotesk + JetBrains Mono fonts, Font Awesome 6.3.0, AOS scroll animations.
+- **functions/** - Node.js 18.x Azure Function (`UpdateVisitorCount`, GET/POST) tracking visitors in Cosmos DB. Runtime v2.0. Cosmos connection via `COSMOSDB_CONNECTION_STRING`.
+- **infra/** - Terraform IaC: Resource Group, Static Web App + custom domain, Cosmos DB (SQL API, free tier), DNS CNAME on existing zone.
 
 ## Common Commands
 
@@ -16,7 +16,7 @@ CVEngine is a serverless portfolio site hosted on Azure. Three components:
 
 ```bash
 cd functions
-npm ci              # CI uses `npm ci` — requires package-lock.json
+npm ci              # CI uses `npm ci` - requires package-lock.json
 npm run build --if-present
 ```
 
@@ -44,12 +44,12 @@ Browser → Azure Static Web App (frontend/) → Azure Function API (`/api/Updat
 
 ### Naming Convention
 
-`${project}-${solution}-${environment}-${location}-${service}-<type>-01` — e.g. `sh-app-prd-uks-cve-rg-01`.
+`${project}-${solution}-${environment}-${location}-${service}-<type>-01` - e.g. `sh-app-prd-uks-cve-rg-01`.
 
 ### Terraform Variables
 
-- `infra/vars/dev.tfvars` — dev
-- `infra/vars/prd.tfvars` — prd
+- `infra/vars/dev.tfvars` - dev
+- `infra/vars/prd.tfvars` - prd
 
 Terraform: `1.15.3` (CI pins `1.15.3`). Providers: `azurerm >= 4.0 < 5.0`, `azuread >= 3.0 < 4.0`.
 
@@ -57,11 +57,11 @@ Terraform: `1.15.3` (CI pins `1.15.3`). Providers: `azurerm >= 4.0 < 5.0`, `azur
 
 Workflows in `.github/workflows/`:
 
-- **terraform.yml** — Push to `major/**`, `minor/**`, `patch/**` under `infra/**`, or `workflow_dispatch` (env: dev/prd, action: plan/apply/destroy). Uses OIDC (`ARM_USE_OIDC=true`) via federated creds; no client secret. Composite action `./.github/actions/ensure-tfstate-container` bootstraps the backend container.
-- **swa.yml** — Push to `major/**` / `minor/**` / `patch/**` under `frontend/**` or `functions/**`. Logs into Azure via OIDC, fetches the SWA deployment token at runtime with `az staticwebapp secrets list`, then runs `azure/static-web-apps-deploy`. `app_location: frontend`, `api_location: functions`.
-- **linting.yml** — Super-Linter (Biome disabled).
-- **zizmor.yml** — GitHub Actions workflow security scanner.
-- **tag.yml** — Git version tagging.
+- **terraform.yml** - Push to `major/**`, `minor/**`, `patch/**` under `infra/**`, or `workflow_dispatch` (env: dev/prd, action: plan/apply/destroy). Uses OIDC (`ARM_USE_OIDC=true`) via federated creds; no client secret. Composite action `./.github/actions/ensure-tfstate-container` bootstraps the backend container.
+- **swa.yml** - Push to `major/**` / `minor/**` / `patch/**` under `frontend/**` or `functions/**`. Logs into Azure via OIDC, fetches the SWA deployment token at runtime with `az staticwebapp secrets list`, then runs `azure/static-web-apps-deploy`. `app_location: frontend`, `api_location: functions`.
+- **linting.yml** - Super-Linter (Biome disabled).
+- **zizmor.yml** - GitHub Actions workflow security scanner.
+- **tag.yml** - Git version tagging.
 
 Linter configs in `.github/linters/` (Prettier, TFLint, Checkov).
 
