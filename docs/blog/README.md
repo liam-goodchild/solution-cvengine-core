@@ -58,6 +58,7 @@ Required Azure Static Web App app settings:
 
 - `BREVO_API_KEY`
 - `BREVO_LIST_ID`
+- `BREVO_SENDER_ID` (recommended; use the verified Brevo sender ID)
 - `BLOG_NOTIFY_SECRET`
 - `EMAIL_FROM`
 - `EMAIL_FROM_NAME`
@@ -73,6 +74,7 @@ Required GitHub environment secrets:
 Required GitHub environment variables:
 
 - `BREVO_LIST_ID`
+- `BREVO_SENDER_ID`
 - `EMAIL_FROM`
 - `EMAIL_FROM_NAME`
 - `PUBLIC_SITE_URL`

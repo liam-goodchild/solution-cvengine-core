@@ -17,6 +17,7 @@ resource "azurerm_static_web_app" "main" {
       app_settings["BLOG_NOTIFY_SECRET"],
       app_settings["BREVO_API_KEY"],
       app_settings["BREVO_LIST_ID"],
+      app_settings["BREVO_SENDER_ID"],
       app_settings["EMAIL_DAILY_LIMIT"],
       app_settings["EMAIL_FROM"],
       app_settings["EMAIL_FROM_NAME"],

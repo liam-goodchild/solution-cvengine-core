@@ -30,6 +30,7 @@ function getEnv(...names) {
 
 function getEmailConfig() {
   const listId = Number.parseInt(getEnv("BREVO_LIST_ID", "BrevoListId"), 10);
+  const senderId = Number.parseInt(getEnv("BREVO_SENDER_ID", "BrevoSenderId"), 10);
   const dailyLimit = Number.parseInt(
     getEnv("EMAIL_DAILY_LIMIT", "EmailDailyLimit") ||
       String(DEFAULT_EMAIL_DAILY_LIMIT),
@@ -43,6 +44,7 @@ function getEmailConfig() {
   return {
     apiKey: getEnv("BREVO_API_KEY", "BrevoApiKey"),
     listId,
+    senderId: Number.isInteger(senderId) && senderId > 0 ? senderId : null,
     notifySecret: getEnv("BLOG_NOTIFY_SECRET", "BlogNotifySecret"),
     dailyLimit: Number.isFinite(dailyLimit)
       ? Math.min(dailyLimit, DEFAULT_EMAIL_DAILY_LIMIT)
@@ -63,7 +65,11 @@ function validateBrevoSubscriptionConfig(config) {
 function validateBrevoNotificationConfig(config) {
   validateBrevoSubscriptionConfig(config);
 
-  if (!config.notifySecret || !config.fromEmail || !config.publicSiteUrl) {
+  if (
+    !config.notifySecret ||
+    (!config.senderId && !config.fromEmail) ||
+    !config.publicSiteUrl
+  ) {
     throw new Error("Missing Brevo notification configuration");
   }
 }
@@ -308,14 +314,17 @@ function renderBlogNotificationHtml(post, config) {
 
 async function createAndSendBrevoCampaign(post, config) {
   const htmlContent = renderBlogNotificationHtml(post, config);
+  const sender = config.senderId
+    ? { id: config.senderId }
+    : {
+        name: config.fromName,
+        email: config.fromEmail,
+      };
   const campaign = await brevoRequest("/emailCampaigns", {
     method: "POST",
     body: {
       name: `Portfolio blog: ${post.title}`,
-      sender: {
-        name: config.fromName,
-        email: config.fromEmail,
-      },
+      sender,
       subject: `New post: ${post.title}`,
       previewText: textFromHtml(post.description).slice(0, 130),
       htmlContent,

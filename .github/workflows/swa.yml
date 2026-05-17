@@ -84,6 +84,7 @@ jobs:
           BLOG_NOTIFY_SECRET: ${{ secrets.BLOG_NOTIFY_SECRET }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           BREVO_LIST_ID: ${{ vars.BREVO_LIST_ID }}
+          BREVO_SENDER_ID: ${{ vars.BREVO_SENDER_ID }}
           EMAIL_DAILY_LIMIT: ${{ vars.EMAIL_DAILY_LIMIT || '250' }}
           EMAIL_FROM: ${{ vars.EMAIL_FROM }}
           EMAIL_FROM_NAME: ${{ vars.EMAIL_FROM_NAME || 'Liam Goodchild' }}
@@ -112,6 +113,10 @@ jobs:
 
           if [ -n "${EMAIL_REPLY_TO}" ]; then
             settings+=("EMAIL_REPLY_TO=${EMAIL_REPLY_TO}")
+          fi
+
+          if [ -n "${BREVO_SENDER_ID}" ]; then
+            settings+=("BREVO_SENDER_ID=${BREVO_SENDER_ID}")
           fi
 
           az staticwebapp appsettings set \
