@@ -455,7 +455,7 @@ app.http("Subscribe", {
 
     if (body.website) {
       return jsonResponse(200, {
-        message: "Thanks — check your inbox when the next post goes live.",
+        message: "Thanks, check your inbox when the next post goes live.",
       });
     }
 
@@ -484,7 +484,7 @@ app.http("Subscribe", {
       });
 
       return jsonResponse(200, {
-        message: "Thanks — you’re on the list for future blog updates.",
+        message: "Thanks, you’re on the list for future blog updates.",
       });
     } catch (error) {
       console.error("Failed to subscribe contact:", error?.message ?? error);
