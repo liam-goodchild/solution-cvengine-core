@@ -1,6 +1,6 @@
 ---
 title: Python Helpers for Faster Agent Skills
-description: Why I am moving repeatable skill work into Python helpers so Claude and Codex spend fewer tokens on chores.
+description: What I learned while moving repeatable work in ops-developer-config into Python-backed Codex and Claude skills.
 date: 2026-05-17
 slug: python-helpers-for-faster-agent-skills
 draft: false
@@ -11,84 +11,84 @@ tags:
   - Python
 ---
 
-I have been changing how my Codex and Claude skills work. The short version: the model should not be doing boring work that a Python script can do faster.
+I have been reworking the skills in my [`ops-developer-config`](https://github.com/liam-goodchild/ops-developer-config) repository so Codex and Claude spend less time doing chores.
 
-The example I keep coming back to is `git-commit-push`.
+That repo is where I keep the small workflows I use across projects: Git cleanup, commit and push, PR creation, Terraform formatting, Obsidian maintenance, study helpers, blog post creation, and a few others. The pattern that has emerged is simple: if the task is repeatable, deterministic, and easy to express as inputs and outputs, it probably belongs in Python. The model should handle judgement, not parse command output for the hundredth time.
 
-That skill used to be the sort of thing where the agent had to inspect the repo, reason about the changed files, decide what to stage, write a commit message, run Git commands, and then explain what happened. Some of that is judgement. A lot of it is plumbing.
+The clearest example is `git-commit-push`.
 
-So I split the job.
+The old version asked the agent to inspect the repository, understand the changed files, decide what to stage, write a commit message, run Git, and explain the result. Some of that is useful model work. Most of it is plumbing.
 
-The Python helper now does the mechanical bits:
+So I moved the plumbing into `skills/git/git-commit-push/scripts/git-commit-push-helper.py`.
+
+The helper now does the mechanical work:
 
 - reads `git status` in a machine-friendly format
 - detects the current branch and upstream
 - blocks commits to `main` and `master` unless the repo is explicitly allowed
-- scans changed files for obvious risk flags like secrets, `.env` files, binaries, and large files
-- stages exactly the files from a JSON plan
-- commits with the message from that plan
+- flags likely secrets, `.env` files, binaries, and large files
+- stages exactly the files named in a JSON plan
+- commits with the supplied message
 - pushes to origin
-- returns structured output the agent can summarise
+- returns structured output for the agent to summarise
 
-The agent still has work to do. It decides whether the risk flags are acceptable. It groups changes into sensible commits when there are enough files to justify it. It writes the commit message in plain English. That is where the model earns its keep.
+The skill file is much thinner now. It tells the agent to run `inspect`, review fields like `has_changes`, `blocked`, and `risk_flags`, create a plan JSON outside the repo, and then call `apply`. That is a better contract than a long prompt full of shell instructions.
 
-What I do not need is the model spending half a page thinking about how to run `git status`, whether a relative path escapes the repository, or how to parse a rename from porcelain output. Python is better at that. It is quicker, cheaper, and less likely to hallucinate its way into a weird half-command.
+The model still earns its keep. It decides whether a warning is acceptable, whether the changed files should be split into more than one commit, and what the commit message should say. But it no longer has to remember exactly how I want Git called, or how to avoid staging the plan file it just created.
 
-## The token leak is real
+## The token leak was hiding in plain sight
 
-This started as a speed thing, but token usage is the bigger irritation.
+This started as a speed improvement, but token usage became the real reason to keep going.
 
-Claude and Codex are useful enough that I keep giving them more of my workflow. Then I look at the usage and it feels like a pipe with a hole in it. Not a dramatic burst. Just a constant hiss of tokens disappearing into tasks that were never language problems in the first place.
+I use these agents often enough that small inefficiencies add up. A model reading the same file lists, restating the same safety checks, and walking through the same command sequence is not doing high-value work. It is just spending tokens on process.
 
-Reading file lists is not a language problem.
+A few examples from the repo made this obvious:
 
-Checking whether a branch is protected is not a language problem.
+- `git-cleanup` can inspect branches and tags, produce a deletion plan, dry-run it, and apply it without the model hand-rolling Git commands.
+- `create-blog-post` can handle slug generation, front matter checks, and generated frontend validation.
+- `format-markdown` can do deterministic Markdown cleanup while leaving tone and meaning to the model.
+- `humanizer` can flag repeated AI-writing patterns so the model has a better starting point for editing.
 
-Validating a Terraform variable has a type is not a language problem.
+None of those checks are language problems. They are small, boring programs. Once they are Python helpers, the skill prompts get shorter and the agent has fewer chances to improvise something unsafe.
 
-A model can do those things, but making it do them repeatedly is wasteful. It also makes the skill prompt longer because every safety rule has to be explained in prose. Once the rule is in Python, the skill can be smaller: inspect, review, plan, apply.
+## Terraform made the boundary obvious
 
-## Terraform made the same point louder
+The `format-terraform` skill pushed this from a preference into a rule.
 
-`format-terraform` pushed me further in this direction.
+Terraform work is not where I want creative interpretation. I want repeatable checks and clear failures. The helper in `skills/terraform/format-terraform/scripts/format-terraform-helper.py` looks for the standards I use across my infrastructure repositories:
 
-Terraform formatting has some judgement in it, especially around functional grouping and whether a resource can really be tagged. But most of my standards are objective:
+- `.tf` files under `infra/`
+- `.tfvars` files under `infra/vars/`
+- variables with descriptions and explicit types
+- pinned Terraform and provider versions
+- committed lock files
+- exact area header formatting in tfvars files
+- no secrets in tfvars
+- taggable Azure resources using `local.tags` or `merge(local.tags, ...)`
+- naming that follows Microsoft Cloud Adoption Framework abbreviations where it fits
 
-- `.tf` files belong under `infra/`
-- `.tfvars` files belong under `infra/vars/`
-- variables need descriptions and explicit types
-- provider and CLI versions should be pinned
-- tfvars files need the exact area header format I use
-- secrets should not sit in tfvars
-- taggable Azure resources should use `local.tags` or merge with it
-- naming should follow the Microsoft Cloud Adoption Framework abbreviations where possible
+Those rules should not live only as prose in a prompt. The helper can report findings with rule names, paths, line numbers, severity, and suggested fixes. The model can then explain the findings, decide what is safe to change, and spot the cases that need human judgement: provider quirks, CAF exceptions, externally supplied variables, or Azure resources that do not behave quite like the docs imply.
 
-That is not a prompt. That is a test suite pretending to be a prompt.
+That split matters. If `format-terraform` produces a bad result, I can tell whether the helper enforced the wrong rule or the model made a poor judgement call. Before this change, those two failure modes were mixed together.
 
-So the helper became the test suite. It can scan Terraform files, report findings with rule names, files, lines, severity, and suggested fixes. The model can then explain the findings and decide what is safe to fix. The script supplies the facts. The model supplies judgement.
+## The shape that keeps working
 
-That boundary matters because Terraform work is exactly where I do not want vibes. I want boring checks. I want repeatable failures. I want the same repository to produce the same findings tomorrow without the model getting creative.
+Most of the Python-backed skills in `ops-developer-config` are settling into the same flow:
 
-## The shape I like: inspect, plan, apply
+1. `inspect` gathers facts and returns compact JSON.
+2. The agent reviews the JSON and creates an explicit plan.
+3. `apply` performs the side effects from that plan.
 
-The pattern that seems to work is simple.
+For risky operations, I add a dry-run or a blocking field. For file writes, I make the helper validate repository-relative paths. For multi-step changes, the plan lives outside the repository so the agent does not accidentally commit its own scratch file.
 
-First, the helper inspects the repo and returns JSON. No drama. Just facts.
+It is not a complicated architecture, but it makes the skills easier to trust. The Python code owns parsing, validation, command orchestration, and stable output. The model owns the parts that actually benefit from language: explanation, grouping, summaries, trade-offs, and the occasional judgement call.
 
-Then the model creates a plan. This is where it can decide whether one commit is enough, whether a Terraform fix is safe, or whether a risk flag needs human approval.
+## What I learned
 
-Then the helper applies the plan. It should only touch the files named in the plan, and it should fail loudly if something looks wrong.
+The main finding from this work is that better agent skills are often smaller agent skills.
 
-That shape gives the agent a smaller job and gives me a clearer audit trail. If something breaks, I can usually tell whether the model made a bad judgement or the script made a bad check. Those are different problems, and separating them makes both easier to fix.
+My first instinct was to make the prompts more detailed: add more rules, more examples, more warnings. That works up to a point, but it also makes every run heavier. Moving objective checks into helper scripts has been cleaner. The prompt becomes a contract. The helper becomes the testable part. The model gets a narrower job.
 
-## The human bit
-
-I do not want to automate all the thinking out of the workflow. That would be missing the point.
-
-The useful part of these agents is still the squishy bit: explaining trade-offs, naming a commit properly, spotting that two files belong together, or deciding that a Terraform rule needs an exception because Azure is being Azure.
-
-But I do want to stop paying premium-model prices for chores.
-
-So that is the direction I am taking the skills in `ops-developer-config`: small Python wrappers for the predictable work, short skill files that describe the contract, and models used for the parts where language and judgement are actually useful.
+That is the direction I am taking `ops-developer-config`: short skill files, Python helpers for the predictable work, and agents reserved for the parts where judgement matters.
 
 It is not glamorous. That is why I like it.
