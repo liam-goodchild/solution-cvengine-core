@@ -41,6 +41,6 @@ liamgoodchild12@hotmail.co.uk | 07398342855 | [GitHub](https://github.com/liam-g
 
 ## **CERTIFICATIONS, SKILLS & EDUCATION**
 
-- **Certifications:** Microsoft Certified: Azure DevOps Engineer Expert (AZ-400), Azure Solutions Architect (AZ-305), Azure Administrator (AZ-104); CompTIA Security+, Network+, A+
+- **Certifications:** Microsoft Certified: Azure DevOps Engineer Expert (AZ-400), Azure Solutions Architect (AZ-305), Azure Administrator (AZ-104); HashiCorp Certified: Terraform Associate; CompTIA Security+, Network+, A+
 - **Skills:** IaC (Terraform, Bicep); CI/CD (Azure DevOps, GitHub Actions); Azure (broad service coverage); DevSecOps; Scripting (PowerShell, Bash); M365 (Exchange Online, Intune); Windows Server 2012–2022; Virtualization (VMware, Hyper-V); Disaster Recovery & Backup
 - **Education:** Dame Elizabeth Cadbury (2011–2016) - 10 GCSEs, A-C, including Computer Science, Maths, English, and Science.
