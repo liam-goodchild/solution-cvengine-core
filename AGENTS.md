@@ -27,8 +27,8 @@ State lives in a platform storage account; backend is configured at init time:
 ```bash
 cd infra
 terraform init \
-  -backend-config="resource_group_name=<rg>" \
-  -backend-config="storage_account_name=sttfsplatform<env>uks01" \
+  -backend-config="resource_group_name=rg-platform-<env>-uks-01" \
+  -backend-config="storage_account_name=stplatform<env>uks02" \
   -backend-config="container_name=<repo-name>" \
   -backend-config="key=terraform.tfstate"
 terraform validate
@@ -65,7 +65,7 @@ Workflows in `.github/workflows/`:
 
 Linter configs in `.github/linters/` (Prettier, TFLint, Checkov).
 
-Secrets required in the environment (`dev` / `prd`): `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_PLATFORM_SUBSCRIPTION_ID`.
+Environment **variables** required (`dev` / `prd`): `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_PLATFORM_SUBSCRIPTION_ID` (set by `infra-landingzone-platform/scripts/bootstrap-platform.sh`). Sensitive values are fetched from the platform Key Vault (`kv-platform-<env>-uks-02`) after OIDC login.
 
 Branch naming drives CI: only `major/**`, `minor/**`, `patch/**` branches trigger deploy workflows on push.
 
