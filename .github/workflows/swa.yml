@@ -45,12 +45,12 @@ jobs:
       SWA_NAME: stapp-cvengine-${{ inputs.environment || 'prd' }}-uks-01
       SWA_RESOURCE_GROUP: rg-cvengine-${{ inputs.environment || 'prd' }}-uks-01
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 20
 
@@ -65,9 +65,18 @@ jobs:
       - name: Azure login
         uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Fetch secrets from Key Vault
+        uses: skyhaven-ltd/pipeline-engineering-github-actions/actions/keyvault-secrets@6cfa143b42ff464e4101d69c09945db9fac369e5 # v2.0.0
+        with:
+          keyvault_name: kv-platform-${{ inputs.environment || 'prd' }}-uks-02
+          secrets: |
+            BLOG_NOTIFY_SECRET=cvengine-blog-notify-secret
+            BREVO_API_KEY=cvengine-brevo-api-key
+          login: "false"
 
       - name: Fetch SWA deployment token
         id: swa-token
@@ -87,8 +96,7 @@ jobs:
 
       - name: Configure blog email app settings
         env:
-          BLOG_NOTIFY_SECRET: ${{ secrets.BLOG_NOTIFY_SECRET }}
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          # BLOG_NOTIFY_SECRET and BREVO_API_KEY come from the Key Vault fetch step
           BREVO_LIST_ID: ${{ vars.BREVO_LIST_ID }}
           BREVO_SENDER_ID: ${{ vars.BREVO_SENDER_ID }}
           EMAIL_DAILY_LIMIT: ${{ vars.EMAIL_DAILY_LIMIT || '250' }}
@@ -146,7 +154,7 @@ jobs:
       - name: Notify blog subscribers
         env:
           BLOG_NOTIFY_ON_PUSH: ${{ vars.BLOG_NOTIFY_ON_PUSH || 'false' }}
-          BLOG_NOTIFY_SECRET: ${{ secrets.BLOG_NOTIFY_SECRET }}
+          # BLOG_NOTIFY_SECRET comes from the Key Vault fetch step
           BLOG_NOTIFY_URL: https://${{ steps.swa-token.outputs.default_hostname }}/api/NotifyPost
           GITHUB_EVENT_BEFORE: ${{ github.event.before }}
           NOTIFY_POSTS_INPUT: ${{ inputs.notify_posts || 'none' }}
