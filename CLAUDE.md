@@ -51,19 +51,19 @@ Browser → Azure Static Web App (frontend/) → Azure Function API (`/api/Updat
 - `infra/vars/dev.tfvars` - dev
 - `infra/vars/prd.tfvars` - prd
 
-Terraform: `1.15.3` (CI pins `1.15.3`). Providers: `azurerm >= 4.0 < 5.0`, `azuread >= 3.0 < 4.0`.
+Terraform: `1.14.8` (shared pipeline default; `required_version >= 1.9.0`). Providers: `azurerm >= 4.0 < 5.0`, `azuread >= 3.0 < 4.0`.
 
 ### CI/CD (GitHub Actions)
 
-Workflows in `.github/workflows/`:
+Workflows in `.github/workflows/` consume the shared reusable workflows and composite actions from `skyhaven-ltd/pipeline-engineering-github-actions`, SHA-pinned to a released tag:
 
-- **terraform.yml** - Push to `major/**`, `minor/**`, `patch/**` under `infra/**`, or `workflow_dispatch` (env: dev/prd, action: plan/apply/destroy). Uses OIDC (`ARM_USE_OIDC=true`) via federated creds; no client secret. Composite action `./.github/actions/ensure-tfstate-container` bootstraps the backend container.
+- **terraform.yml** - Push to `major/**`, `minor/**`, `patch/**` under `infra/**`, or `workflow_dispatch` (env: dev/prd, action: plan/apply/destroy). Uses OIDC (`ARM_USE_OIDC=true`) via federated creds; no client secret. State plumbing and Key Vault secret fetching are delegated to the shared composite actions.
 - **swa.yml** - Push to `major/**` / `minor/**` / `patch/**` under `frontend/**` or `functions/**`. Logs into Azure via OIDC, fetches the SWA deployment token at runtime with `az staticwebapp secrets list`, then runs `azure/static-web-apps-deploy`. `app_location: frontend`, `api_location: functions`.
-- **linting.yml** - Super-Linter (Biome disabled).
-- **zizmor.yml** - GitHub Actions workflow security scanner.
-- **tag.yml** - Git version tagging.
+- **lint.yml** - shared `reusable-lint.yml` (MegaLinter, `cupcake` flavour) on PRs to `main`.
+- **pr-validation.yml** - shared `reusable-terraform.yml` on PRs to `main`: Terraform hygiene, zizmor, then real dev+prd plans with Checkov plan-aware scanning. Plan-time secrets come from the platform Key Vault via `tf_var_secrets`.
+- **tag.yml** - shared `reusable-tag.yml` creates a semver tag on PR merge.
 
-Linter configs in `.github/linters/` (Prettier, TFLint, Checkov).
+Validation configs in `.github/validation/` (MegaLinter, TFLint, Checkov, zizmor).
 
 Environment **variables** required (`dev` / `prd`): `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_PLATFORM_SUBSCRIPTION_ID` (set by `infra-landingzone-platform/scripts/bootstrap-platform.sh`). Sensitive values are fetched from the platform Key Vault (`kv-platform-<env>-uks-02`) after OIDC login.
 
