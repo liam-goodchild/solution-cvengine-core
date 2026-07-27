@@ -74,8 +74,8 @@ jobs:
         with:
           keyvault_name: kv-platform-${{ inputs.environment || 'prd' }}-uks-02
           secrets: |
-            BLOG_NOTIFY_SECRET=cvengine-blog-notify-secret
-            BREVO_API_KEY=cvengine-brevo-api-key
+            BLOG_NOTIFY_SECRET=app-cvengine-blog-notify-token
+            BREVO_API_KEY=app-cvengine-brevo-api-key
           login: "false"
 
       - name: Fetch SWA deployment token
