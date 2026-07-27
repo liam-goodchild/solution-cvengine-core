@@ -19,5 +19,5 @@ jobs:
     with:
       environments: '["dev","prd"]'
       tf_var_secrets: |
-        TF_VAR_cloudflare_api_token=cloudflare-api-token
-        TF_VAR_cloudflare_account_id=cloudflare-account-id
+        TF_VAR_cloudflare_api_token=platform-cloudflare-api-token
+        TF_VAR_cloudflare_account_id=platform-cloudflare-account-id
